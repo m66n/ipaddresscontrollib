@@ -186,7 +186,8 @@ namespace IPAddressControlLib
       {
          get
          {
-            return TextRenderer.MeasureText( Properties.Resources.FieldMeasureText, Font );
+            return TextRenderer.MeasureText( Graphics.FromHwnd( Handle ),
+               Properties.Resources.FieldMeasureText, Font, Size, TextFormatFlags.NoPadding );
          }
       }
 

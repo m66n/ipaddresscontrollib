@@ -33,9 +33,11 @@ namespace IPAddressControlLib
       {
          get
          {
-            if ( Control.AutoSize )
+            IPAddressControl control = (IPAddressControl)Control;
+
+            if ( control.AutoHeight )
             {
-               return SelectionRules.Moveable | SelectionRules.Visible;
+               return SelectionRules.Moveable | SelectionRules.Visible | SelectionRules.LeftSizeable | SelectionRules.RightSizeable;
             }
             else
             {

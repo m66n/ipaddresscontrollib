@@ -77,7 +77,7 @@ namespace IPAddressControlLib
       private FieldControl[] _fieldControls = new FieldControl[NumberOfFields];
       private DotControl[] _dotControls     = new DotControl[NumberOfFields-1];
 
-      private bool _autoSize;
+      private bool _autoHeight = true;
       private BorderStyle _borderStyle = BorderStyle.Fixed3D;
       private bool _readOnly;
 
@@ -97,16 +97,16 @@ namespace IPAddressControlLib
       #region Public Properies
 
       [Browsable(true)]
-      public bool AutoSize
+      public bool AutoHeight
       {
          get 
          {
-            return _autoSize;
+            return _autoHeight;
          }
          set
          {
-            _autoSize = value;
-            if ( _autoSize )
+            _autoHeight = value;
+            if ( _autoHeight )
             {
                AdjustSize();
             }
@@ -189,8 +189,8 @@ namespace IPAddressControlLib
          }
       }
 
+      [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
       [Bindable(true),Browsable(true)]
-      [DefaultValue("0.0.0.0")]
       public override string Text
       {
          get
@@ -400,7 +400,7 @@ namespace IPAddressControlLib
             newSize = new Size( newSize.Width, this.Size.Height );
          }
 
-         if ( _autoSize )
+         if ( AutoHeight )
          {
             this.Size = new Size( newSize.Width, MinimumSize.Height );
          }
@@ -838,7 +838,7 @@ namespace IPAddressControlLib
                   lParam.cy = MinimumSize.Height;
                }
 
-               if ( _autoSize && lParam.cy != MinimumSize.Height )
+               if ( AutoHeight && lParam.cy != MinimumSize.Height )
                {
                   lParam.flags |= NativeMethods.SWP_NOMOVE;
                   lParam.cy = MinimumSize.Height;

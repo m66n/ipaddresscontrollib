@@ -80,24 +80,25 @@ namespace IPAddressControlLib
 
       #region Public Properties
 
-      [DefaultValue(true)]
-      public override bool AutoSize
+      [Browsable( true )]
+      public bool AutoHeight
       {
          get
          {
-            return base.AutoSize;
+            return _autoHeight;
          }
          set
          {
-            base.AutoSize = value;
+            _autoHeight= value;
 
-            if ( AutoSize )
+            if ( _autoHeight )
             {
                AdjustSize();
             }
          }
       }
 
+      [Browsable( false )]
       public int Baseline
       {
          get 
@@ -120,6 +121,7 @@ namespace IPAddressControlLib
          }
       }
 
+      [Browsable( true )]
       public bool Blank
       {
          get
@@ -136,7 +138,7 @@ namespace IPAddressControlLib
          }
       }
 
-      [DefaultValue(BorderStyle.Fixed3D)]
+      [Browsable( true )]
       public new BorderStyle BorderStyle
       {
          get
@@ -151,6 +153,7 @@ namespace IPAddressControlLib
          }
       }
 
+      [Browsable( false )]
       public override bool Focused
       {
          get
@@ -167,6 +170,7 @@ namespace IPAddressControlLib
          }
       }
 
+      [Browsable( true )]
       public override Size MinimumSize
       {
          get
@@ -175,6 +179,7 @@ namespace IPAddressControlLib
          }
       }
 
+      [Browsable( true )]
       public bool ReadOnly
       {
          get
@@ -200,6 +205,7 @@ namespace IPAddressControlLib
       }
 
       [Browsable(true)]
+      [DesignerSerializationVisibility( DesignerSerializationVisibility.Visible )]
       public override string Text
       {
          get
@@ -208,11 +214,11 @@ namespace IPAddressControlLib
 
             for ( int index = 0; index < _fieldControls.Length; ++index )
             {
-               sb.Append( _fieldControls[index].Text );
+               sb.Append( _fieldControls[ index ].Text );
 
                if ( index < _dotControls.Length )
                {
-                  sb.Append( _dotControls[index].Text );
+                  sb.Append( _dotControls[ index ].Text );
                }
             }
 
@@ -340,7 +346,6 @@ namespace IPAddressControlLib
          _referenceTextBox.AutoSize = true;
 
          Size = MinimumSize;
-         AutoSize = true;
 
          DragEnter += new DragEventHandler( IPAddressControl_DragEnter );
          DragDrop += new DragEventHandler( IPAddressControl_DragDrop );
@@ -439,9 +444,9 @@ namespace IPAddressControlLib
             newSize.Height = Size.Height;
          }
 
-         if ( AutoSize )
+         if ( AutoHeight )
          {
-            Size = new Size( MinimumSize.Width, MinimumSize.Height );
+            Size = new Size( newSize.Width, MinimumSize.Height );
          }
          else
          {
@@ -690,6 +695,7 @@ namespace IPAddressControlLib
 
       #region Private Data
 
+      private bool _autoHeight = true;
       private bool _readOnly;
       private BorderStyle _borderStyle = BorderStyle.Fixed3D;
       private FieldControl[] _fieldControls = new FieldControl[NumberOfFields];

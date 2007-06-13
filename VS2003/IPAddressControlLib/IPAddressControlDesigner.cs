@@ -35,7 +35,7 @@ namespace IPAddressControlLib
          {
             IPAddressControl ctrl = (IPAddressControl)Control;
 
-            if ( ctrl.AutoSize )
+            if ( ctrl.AutoHeight )
             {
                return SelectionRules.LeftSizeable | SelectionRules.RightSizeable | SelectionRules.Moveable | SelectionRules.Visible;
             }
