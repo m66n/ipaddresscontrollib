@@ -35,16 +35,9 @@ namespace IPAddressControlLib
       public override Size MinimumSize
       {
          get
-         {
-            int count = 10;
-            
-            string measureString = new String( Properties.Resources.FieldSeparator[0], count );
-
-            Size minimumSize = TextRenderer.MeasureText( measureString, Font );
-
-            minimumSize.Width /= count;
-
-            return minimumSize;
+         {            
+            return TextRenderer.MeasureText( Graphics.FromHwnd( Handle ), Text,
+               Font, Size, _textFormatFlags );
          }
       }
 
@@ -81,10 +74,11 @@ namespace IPAddressControlLib
          SetStyle( ControlStyles.OptimizedDoubleBuffer, true );
          SetStyle( ControlStyles.AllPaintingInWmPaint, true );
 
+         Text = Properties.Resources.FieldSeparator;
+
          BackColor = SystemColors.Window;
          Size = MinimumSize;
          TabStop = false;
-         Text = Properties.Resources.FieldSeparator;
       }
 
       #endregion // Constructors
@@ -127,10 +121,8 @@ namespace IPAddressControlLib
 
          e.Graphics.FillRectangle( new SolidBrush( backColor ), ClientRectangle );
 
-         StringFormat stringFormat = new StringFormat();
-         stringFormat.Alignment = StringAlignment.Center;
-
-         e.Graphics.DrawString( Text, Font, new SolidBrush( textColor ), ClientRectangle, stringFormat );
+         TextRenderer.DrawText( e.Graphics, Text, Font, ClientRectangle,
+            textColor, _textFormatFlags );
       }
 
       protected override void OnParentBackColorChanged( EventArgs e )
@@ -149,7 +141,7 @@ namespace IPAddressControlLib
       protected override void OnSizeChanged( EventArgs e )
       {
          base.OnSizeChanged( e );
-         Size = MinimumSize;
+         base.Size = MinimumSize;
       }
 
       #endregion // Protected Methods
@@ -158,6 +150,9 @@ namespace IPAddressControlLib
 
       private bool _backColorChanged;
       private bool _readOnly;
+
+      private TextFormatFlags _textFormatFlags = TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix |
+         TextFormatFlags.SingleLine | TextFormatFlags.NoPadding;
 
       #endregion // Private Data
    }
