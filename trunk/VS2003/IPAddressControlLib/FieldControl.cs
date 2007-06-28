@@ -52,6 +52,7 @@ namespace IPAddressControlLib
 	internal class FieldControl : System.Windows.Forms.TextBox
 	{
       public event CedeFocusHandler CedeFocusEvent;
+      public event KeyPressEventHandler FieldKeyPressedEvent;
       public event SpecialKeyHandler SpecialKeyEvent;
       public event TextChangedHandler TextChangedEvent;
 
@@ -235,9 +236,24 @@ namespace IPAddressControlLib
 
       #region Overrides
 
+      protected override void OnGotFocus(EventArgs e)
+      {
+         base.OnGotFocus( e );
+
+         SelectionStart = 0;
+         SelectionLength = TextLength;
+      }
+
+
       protected override void OnKeyDown( KeyEventArgs e )
       {
          base.OnKeyDown( e );
+
+         if ( FieldKeyPressedEvent != null )
+         {
+            KeyPressEventArgs args = new KeyPressEventArgs( Convert.ToChar( e.KeyCode, CultureInfo.InvariantCulture ) );
+            FieldKeyPressedEvent( this, args );
+         }
 
          if ( e.KeyCode == Keys.Home || 
               e.KeyCode == Keys.End )

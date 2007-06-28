@@ -97,6 +97,27 @@ namespace IPAddressControlLib
       #region Public Properies
 
       [Browsable(true)]
+      public bool AllowInternalTab
+      {
+         get
+         {
+            foreach ( FieldControl fc in _fieldControls )
+            {
+               return fc.TabStop;
+            }
+
+            return false;
+         }
+         set
+         {
+            foreach ( FieldControl fc in _fieldControls )
+            {
+               fc.TabStop = value;
+            }
+         }
+      }
+
+      [Browsable(true)]
       public bool AutoHeight
       {
          get 
@@ -320,6 +341,7 @@ namespace IPAddressControlLib
             _fieldControls[index].Parent = this;
             _fieldControls[index].FieldId = index;
             _fieldControls[index].CedeFocusEvent += new CedeFocusHandler( this.OnCedeFocus );
+            _fieldControls[index].FieldKeyPressedEvent += new KeyPressEventHandler( OnFieldKeyPressed );
             _fieldControls[index].SpecialKeyEvent += new SpecialKeyHandler( this.OnSpecialKey );
             _fieldControls[index].TextChangedEvent += new TextChangedHandler( this.OnFieldTextChanged );
             this.Controls.Add( _fieldControls[index] );
@@ -555,6 +577,11 @@ namespace IPAddressControlLib
          _fieldControls[index].Text = text.Substring( textIndex );
       }
 
+      private void OnFieldKeyPressed( object sender, KeyPressEventArgs e )
+      {
+         OnKeyPress( e );
+      }
+
       private void OnSpecialKey( int fieldId, Keys keyCode )
       {
          switch ( keyCode )
@@ -684,7 +711,10 @@ namespace IPAddressControlLib
             }
          }
 
-         e.Graphics.FillRectangle( ctrlBrush, ClientRectangle );
+         using ( ctrlBrush )
+         {
+            e.Graphics.FillRectangle( ctrlBrush, ClientRectangle );
+         }
 
          switch ( BorderStyle )
          {
@@ -714,7 +744,10 @@ namespace IPAddressControlLib
          {
             e.Graphics.ReleaseHdc( hdc );
 
-            e.Graphics.FillRectangle( new SolidBrush( this.BackColor ), this.ClientRectangle );
+            using ( SolidBrush backgroundBrush = new SolidBrush( BackColor ) )
+            {
+               e.Graphics.FillRectangle( backgroundBrush, ClientRectangle );
+            }
 
             hdc = e.Graphics.GetHdc();
 

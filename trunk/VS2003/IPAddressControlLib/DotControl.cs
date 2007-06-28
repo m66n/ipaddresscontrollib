@@ -156,12 +156,18 @@ namespace IPAddressControlLib
             }
          }
 
-         e.Graphics.FillRectangle( ctrlBrush, ClientRectangle );
+         using ( ctrlBrush )
+         {
+            e.Graphics.FillRectangle( ctrlBrush, ClientRectangle );
+         }
 
          StringFormat stringFormat = new StringFormat();
          stringFormat.Alignment = StringAlignment.Center;
 
-         e.Graphics.DrawString( this.Text, this.Font, textBrush, this.ClientRectangle, stringFormat );
+         using ( textBrush )
+         {
+            e.Graphics.DrawString( this.Text, this.Font, textBrush, this.ClientRectangle, stringFormat );
+         }
       }
 
       protected void OnPaintThemed( PaintEventArgs e )
@@ -180,7 +186,10 @@ namespace IPAddressControlLib
          {
             e.Graphics.ReleaseHdc( hdc );
 
-            e.Graphics.FillRectangle( new SolidBrush( this.BackColor ), this.ClientRectangle );
+            using ( SolidBrush backgroundBrush = new SolidBrush( BackColor ) )
+            {
+               e.Graphics.FillRectangle( backgroundBrush, this.ClientRectangle );
+            }
 
             hdc = e.Graphics.GetHdc();
          }
@@ -258,12 +267,13 @@ namespace IPAddressControlLib
          int g = NativeMethods.GetGValue( colorref );
          int b = NativeMethods.GetBValue( colorref );
 
-         SolidBrush textBrush = new SolidBrush( Color.FromArgb( r, g, b ) );
-
          StringFormat stringFormat = new StringFormat();
          stringFormat.Alignment = StringAlignment.Center;
 
-         e.Graphics.DrawString( this.Text, this.Font, textBrush, this.ClientRectangle, stringFormat );
+         using ( SolidBrush textBrush = new SolidBrush( Color.FromArgb( r, g, b ) ) )
+         {
+            e.Graphics.DrawString( this.Text, this.Font, textBrush, this.ClientRectangle, stringFormat );
+         }
       }
 
       protected override void OnPaint( PaintEventArgs e )

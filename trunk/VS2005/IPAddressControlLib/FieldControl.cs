@@ -155,6 +155,7 @@ namespace IPAddressControlLib
       #region Public Events
 
       public event EventHandler<CedeFocusEventArgs> CedeFocusEvent;
+      public event KeyPressEventHandler FieldKeyPressedEvent;
       public event EventHandler<SpecialKeyEventArgs> SpecialKeyEvent;
       public event EventHandler<TextChangedEventArgs> TextChangedEvent;
 
@@ -328,9 +329,14 @@ namespace IPAddressControlLib
       {
          base.OnKeyDown( e );
 
+         if ( FieldKeyPressedEvent != null )
+         {
+            KeyPressEventArgs args = new KeyPressEventArgs( Convert.ToChar( e.KeyCode, CultureInfo.InvariantCulture ) );
+            FieldKeyPressedEvent( this, args );
+         }
+
          if ( e.KeyCode == Keys.Home || 
-              e.KeyCode == Keys.End || 
-              e.KeyCode == Keys.Tab )
+              e.KeyCode == Keys.End )
          {
             SendSpecialKeyEvent( e.KeyCode );
             return;
