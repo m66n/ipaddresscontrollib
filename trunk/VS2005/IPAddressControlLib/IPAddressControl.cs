@@ -81,6 +81,27 @@ namespace IPAddressControlLib
       #region Public Properties
 
       [Browsable( true )]
+      public bool AllowInternalTab
+      {
+         get
+         {
+            foreach ( FieldControl fc in _fieldControls )
+            {
+               return fc.TabStop;
+            }
+
+            return false;
+         }
+         set
+         {
+            foreach ( FieldControl fc in _fieldControls )
+            {
+               fc.TabStop = value;
+            }
+         }
+      }
+
+      [Browsable( true )]
       public bool AutoHeight
       {
          get
@@ -650,6 +671,18 @@ namespace IPAddressControlLib
             case Keys.End:
 
                _fieldControls[NumberOfFields - 1].TakeFocus( Direction.Reverse, Selection.None );
+               break;
+
+            case Keys.Tab:
+
+               if ( e.FieldId < ( NumberOfFields - 1 ) )
+               {
+                  _fieldControls[ e.FieldId + 1 ].TakeFocus( Direction.Forward, Selection.All );
+               }
+               else
+               {
+                  OnLostFocus( EventArgs.Empty );
+               }
                break;
          }
       }

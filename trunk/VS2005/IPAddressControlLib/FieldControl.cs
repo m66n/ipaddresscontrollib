@@ -329,7 +329,8 @@ namespace IPAddressControlLib
          base.OnKeyDown( e );
 
          if ( e.KeyCode == Keys.Home || 
-              e.KeyCode == Keys.End )
+              e.KeyCode == Keys.End || 
+              e.KeyCode == Keys.Tab )
          {
             SendSpecialKeyEvent( e.KeyCode );
             return;
