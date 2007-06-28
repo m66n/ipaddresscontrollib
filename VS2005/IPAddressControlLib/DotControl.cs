@@ -119,7 +119,10 @@ namespace IPAddressControlLib
             }
          }
 
-         e.Graphics.FillRectangle( new SolidBrush( backColor ), ClientRectangle );
+         using ( SolidBrush backgroundBrush = new SolidBrush( backColor ) )
+         {
+            e.Graphics.FillRectangle( backgroundBrush, ClientRectangle );
+         }
 
          TextRenderer.DrawText( e.Graphics, Text, Font, ClientRectangle,
             textColor, _textFormatFlags );

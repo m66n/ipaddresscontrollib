@@ -337,6 +337,7 @@ namespace IPAddressControlLib
 
             _fieldControls[index].CedeFocusEvent += new EventHandler<CedeFocusEventArgs>( this.OnCedeFocus );
             _fieldControls[index].FieldId = index;
+            _fieldControls[index].FieldKeyPressedEvent += new KeyPressEventHandler( OnFieldKeyPressed );
             _fieldControls[index].Name = "FieldControl" + index.ToString( CultureInfo.InvariantCulture );
             _fieldControls[index].Parent = this;
             _fieldControls[index].SpecialKeyEvent += new EventHandler<SpecialKeyEventArgs>( this.OnSpecialKey );
@@ -414,7 +415,10 @@ namespace IPAddressControlLib
             }
          }
 
-         e.Graphics.FillRectangle( new SolidBrush( backColor ), ClientRectangle );
+         using ( SolidBrush backgroundBrush = new SolidBrush( backColor ) )
+         {
+            e.Graphics.FillRectangle( backgroundBrush, ClientRectangle );
+         }
 
          Rectangle rectBorder = new Rectangle( ClientRectangle.Left, ClientRectangle.Top,
             ClientRectangle.Width - 1, ClientRectangle.Height - 1 );
@@ -638,6 +642,11 @@ namespace IPAddressControlLib
          _fieldControls[fieldId].TakeFocus( e.Direction, e.Selection );
       }
 
+      private void OnFieldKeyPressed( Object sender, KeyPressEventArgs e )
+      {
+         OnKeyPress( e );
+      }
+
       private void OnFieldTextChanged( Object sender, TextChangedEventArgs e )
       {
          if ( null != FieldChangedEvent )
@@ -671,18 +680,6 @@ namespace IPAddressControlLib
             case Keys.End:
 
                _fieldControls[NumberOfFields - 1].TakeFocus( Direction.Reverse, Selection.None );
-               break;
-
-            case Keys.Tab:
-
-               if ( e.FieldId < ( NumberOfFields - 1 ) )
-               {
-                  _fieldControls[ e.FieldId + 1 ].TakeFocus( Direction.Forward, Selection.All );
-               }
-               else
-               {
-                  OnLostFocus( EventArgs.Empty );
-               }
                break;
          }
       }
