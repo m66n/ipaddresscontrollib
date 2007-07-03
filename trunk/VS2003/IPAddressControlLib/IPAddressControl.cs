@@ -79,6 +79,7 @@ namespace IPAddressControlLib
 
       private bool _autoHeight = true;
       private BorderStyle _borderStyle = BorderStyle.Fixed3D;
+      private bool _focused;
       private bool _readOnly;
 
 		/// <summary>
@@ -169,6 +170,7 @@ namespace IPAddressControlLib
          }
       }
 
+      [Browsable(false)]
       public override bool Focused
       {
          get
@@ -210,8 +212,8 @@ namespace IPAddressControlLib
          }
       }
 
-      [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
       [Bindable(true),Browsable(true)]
+      [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
       public override string Text
       {
          get
@@ -341,6 +343,7 @@ namespace IPAddressControlLib
             _fieldControls[index].Parent = this;
             _fieldControls[index].FieldId = index;
             _fieldControls[index].CedeFocusEvent += new CedeFocusHandler( this.OnCedeFocus );
+            _fieldControls[index].FieldFocusEvent += new FieldFocusHandler( OnFieldFocus );
             _fieldControls[index].FieldKeyPressedEvent += new KeyPressEventHandler( OnFieldKeyPressed );
             _fieldControls[index].SpecialKeyEvent += new SpecialKeyHandler( this.OnSpecialKey );
             _fieldControls[index].TextChangedEvent += new TextChangedHandler( this.OnFieldTextChanged );
@@ -533,6 +536,32 @@ namespace IPAddressControlLib
          return true;
       }
 
+      private void OnFieldFocus( int fieldId, FocusEventType fet )
+      {
+         switch ( fet )
+         {
+            case FocusEventType.GotFocus:
+
+               if ( !_focused )
+               {
+                  _focused = true;
+                  base.OnGotFocus( EventArgs.Empty );
+               }
+
+               break;
+
+            case FocusEventType.LostFocus:
+
+               if ( !Focused )
+               {
+                  _focused = false;
+                  base.OnLostFocus( EventArgs.Empty );
+               }
+
+               break;
+         }
+      }
+
       private void OnFieldTextChanged( int fieldId, string text )
       {
          if ( FieldChangedEvent != null )
@@ -673,8 +702,18 @@ namespace IPAddressControlLib
 
       protected override void OnGotFocus( EventArgs e )
       {
-         _fieldControls[0].TakeFocus( Direction.Forward, Selection.All );
          base.OnGotFocus( e );
+         _focused = true;
+         _fieldControls[0].TakeFocus( Direction.Forward, Selection.All );
+      }
+
+      protected override void OnLostFocus( EventArgs e )
+      {
+         if ( !Focused )
+         {
+            _focused = false;
+            base.OnLostFocus( e );
+         }
       }
 
       private void OnPaintStandard( PaintEventArgs e )

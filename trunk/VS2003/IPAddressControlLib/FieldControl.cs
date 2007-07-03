@@ -42,7 +42,14 @@ namespace IPAddressControlLib
       All
    };
 
+   internal enum FocusEventType
+   {
+      GotFocus,
+      LostFocus
+   }
+
    internal delegate bool CedeFocusHandler( int fieldId, Direction direction, Selection selection );
+   internal delegate void FieldFocusHandler( int fieldId, FocusEventType fet );
    internal delegate void SpecialKeyHandler( int fieldId, Keys keyCode );
    internal delegate void TextChangedHandler( int fieldId, string newText );
 
@@ -52,6 +59,7 @@ namespace IPAddressControlLib
 	internal class FieldControl : System.Windows.Forms.TextBox
 	{
       public event CedeFocusHandler CedeFocusEvent;
+      public event FieldFocusHandler FieldFocusEvent;
       public event KeyPressEventHandler FieldKeyPressedEvent;
       public event SpecialKeyHandler SpecialKeyEvent;
       public event TextChangedHandler TextChangedEvent;
@@ -236,14 +244,11 @@ namespace IPAddressControlLib
 
       #region Overrides
 
-      protected override void OnGotFocus(EventArgs e)
+      protected override void OnGotFocus( EventArgs e )
       {
          base.OnGotFocus( e );
-
-         SelectionStart = 0;
-         SelectionLength = TextLength;
+         SendFieldFocusEvent( FocusEventType.GotFocus );
       }
-
 
       protected override void OnKeyDown( KeyEventArgs e )
       {
@@ -339,7 +344,7 @@ namespace IPAddressControlLib
          }
       }
 
-      protected override void OnKeyPress(KeyPressEventArgs e)
+      protected override void OnKeyPress( KeyPressEventArgs e )
       {
          if ( _invalidKeyDown )
          {
@@ -347,6 +352,12 @@ namespace IPAddressControlLib
          }
 
          base.OnKeyPress( e );
+      }
+
+      protected override void OnLostFocus( EventArgs e )
+      {
+         base.OnLostFocus( e );
+         SendFieldFocusEvent( FocusEventType.LostFocus );
       }
 
       protected override void OnTextChanged( EventArgs e )
@@ -458,6 +469,14 @@ namespace IPAddressControlLib
          }
 
          return false;
+      }
+
+      private void SendFieldFocusEvent( FocusEventType fet )
+      {
+         if ( null != FieldFocusEvent )
+         {
+            FieldFocusEvent( FieldId, fet );
+         }
       }
 
       private void SendSpecialKeyEvent( Keys keyCode )

@@ -225,6 +225,7 @@ namespace IPAddressControlLib
          }
       }
 
+      [Bindable(true)]
       [Browsable(true)]
       [DesignerSerializationVisibility( DesignerSerializationVisibility.Visible )]
       public override string Text
@@ -335,13 +336,14 @@ namespace IPAddressControlLib
          {
             _fieldControls[index] = new FieldControl();
 
-            _fieldControls[index].CedeFocusEvent += new EventHandler<CedeFocusEventArgs>( this.OnCedeFocus );
+            _fieldControls[index].CedeFocusEvent += new EventHandler<CedeFocusEventArgs>( OnCedeFocus );
+            _fieldControls[index].FieldFocusEvent += new EventHandler<FieldFocusEventArgs>( OnFieldFocus );
             _fieldControls[index].FieldId = index;
             _fieldControls[index].FieldKeyPressedEvent += new KeyPressEventHandler( OnFieldKeyPressed );
             _fieldControls[index].Name = "FieldControl" + index.ToString( CultureInfo.InvariantCulture );
             _fieldControls[index].Parent = this;
-            _fieldControls[index].SpecialKeyEvent += new EventHandler<SpecialKeyEventArgs>( this.OnSpecialKey );
-            _fieldControls[index].TextChangedEvent += new EventHandler<TextChangedEventArgs>( this.OnFieldTextChanged );
+            _fieldControls[index].SpecialKeyEvent += new EventHandler<SpecialKeyEventArgs>( OnSpecialKey );
+            _fieldControls[index].TextChangedEvent += new EventHandler<TextChangedEventArgs>( OnFieldTextChanged );
 
             Controls.Add( _fieldControls[index] );
 
@@ -392,7 +394,17 @@ namespace IPAddressControlLib
       protected override void OnGotFocus( EventArgs e )
       {
          base.OnGotFocus( e );
+         _focused = true;
          _fieldControls[0].TakeFocus( Direction.Forward, Selection.All );
+      }
+
+      protected override void OnLostFocus( EventArgs e )
+      {
+         if ( !Focused )
+         {
+            _focused = false;
+            base.OnLostFocus( e );
+         }
       }
 
       protected override void OnMouseEnter( EventArgs e )
@@ -562,7 +574,7 @@ namespace IPAddressControlLib
       {
          SuspendLayout();
 
-         int difference = this.Size.Width - MinimumSize.Width;
+         int difference = Width - MinimumSize.Width;
 
          Debug.Assert( difference >= 0 );
 
@@ -586,7 +598,7 @@ namespace IPAddressControlLib
          int x = 0;
          int y = 0;
 
-         switch ( this.BorderStyle )
+         switch ( BorderStyle )
          {
             case BorderStyle.Fixed3D:
                x = Fixed3DOffset.Width;
@@ -640,6 +652,32 @@ namespace IPAddressControlLib
          }
 
          _fieldControls[fieldId].TakeFocus( e.Direction, e.Selection );
+      }
+
+      private void OnFieldFocus( Object sender, FieldFocusEventArgs e )
+      {
+         switch ( e.FocusEventType )
+         {
+            case FocusEventType.GotFocus:
+
+               if ( !_focused )
+               {
+                  _focused = true;
+                  base.OnGotFocus( EventArgs.Empty );
+               }
+
+               break;
+
+            case FocusEventType.LostFocus:
+
+               if ( !Focused )
+               {
+                  _focused = false;
+                  base.OnLostFocus( EventArgs.Empty );
+               }
+
+               break;
+         }
       }
 
       private void OnFieldKeyPressed( Object sender, KeyPressEventArgs e )
@@ -726,11 +764,12 @@ namespace IPAddressControlLib
       #region Private Data
 
       private bool _autoHeight = true;
-      private bool _readOnly;
+      private bool _backColorChanged;
       private BorderStyle _borderStyle = BorderStyle.Fixed3D;
+      private bool _focused;
       private FieldControl[] _fieldControls = new FieldControl[NumberOfFields];
       private DotControl[] _dotControls = new DotControl[NumberOfFields - 1];
-      private bool _backColorChanged;
+      private bool _readOnly;
 
       private Size Fixed3DOffset = new Size( 3, 3 );
       private Size FixedSingleOffset = new Size( 2, 2 );
