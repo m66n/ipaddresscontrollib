@@ -83,6 +83,42 @@ namespace IPAddressControlLib
       }
    }
 
+   internal enum FocusEventType
+   {
+      GotFocus,
+      LostFocus
+   }
+
+   internal class FieldFocusEventArgs : EventArgs
+   {
+      private int _fieldId;
+      private FocusEventType _focusEventType;
+
+      public int FieldId
+      {
+         get
+         {
+            return _fieldId;
+         }
+         set
+         {
+            _fieldId = value;
+         }
+      }
+
+      public FocusEventType FocusEventType
+      {
+         get
+         {
+            return _focusEventType;
+         }
+         set
+         {
+            _focusEventType = value;
+         }
+      }
+   }
+
    internal class SpecialKeyEventArgs : EventArgs
    {
       private int _fieldId;
@@ -155,6 +191,7 @@ namespace IPAddressControlLib
       #region Public Events
 
       public event EventHandler<CedeFocusEventArgs> CedeFocusEvent;
+      public event EventHandler<FieldFocusEventArgs> FieldFocusEvent;
       public event KeyPressEventHandler FieldKeyPressedEvent;
       public event EventHandler<SpecialKeyEventArgs> SpecialKeyEvent;
       public event EventHandler<TextChangedEventArgs> TextChangedEvent;
@@ -324,6 +361,18 @@ namespace IPAddressControlLib
       #endregion //Constructors
 
       #region Protected Methods
+
+      protected override void OnGotFocus( EventArgs e )
+      {
+         base.OnGotFocus( e );
+         SendFieldFocusEvent( FocusEventType.GotFocus );
+      }
+
+      protected override void OnLostFocus( EventArgs e )
+      {
+         base.OnLostFocus( e );
+         SendFieldFocusEvent( FocusEventType.LostFocus );
+      }
 
       protected override void OnKeyDown( KeyEventArgs e )
       {
@@ -543,6 +592,17 @@ namespace IPAddressControlLib
             args.Direction = direction;
             args.Selection = selection;
             CedeFocusEvent( this, args );
+         }
+      }
+
+      private void SendFieldFocusEvent( FocusEventType fet )
+      {
+         if ( null != FieldFocusEvent )
+         {
+            FieldFocusEventArgs args = new FieldFocusEventArgs();
+            args.FieldId = FieldId;
+            args.FocusEventType = fet;
+            FieldFocusEvent( this, args );
          }
       }
 
