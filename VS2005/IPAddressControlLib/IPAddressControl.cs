@@ -34,18 +34,18 @@ namespace IPAddressControlLib
 {
    public class FieldChangedEventArgs : EventArgs
    {
-      private int _fieldId;
+      private int _fieldIndex;
       private String _text;
 
-      public int FieldId
+      public int FieldIndex
       {
          get
          {
-            return _fieldId;
+            return _fieldIndex;
          }
          set
          {
-            _fieldId = value;
+            _fieldIndex = value;
          }
       }
 
@@ -63,12 +63,11 @@ namespace IPAddressControlLib
    }
 
    [DesignerAttribute( typeof( IPAddressControlDesigner ) )]
-   public partial class
-   IPAddressControl : UserControl
+   public partial class IPAddressControl : UserControl
    {
       #region Public Constants
 
-      public const int NumberOfFields = 4;
+      public const int FieldCount = 4;
 
       #endregion // Public Constants
 
@@ -98,6 +97,23 @@ namespace IPAddressControlLib
             {
                fc.TabStop = value;
             }
+         }
+      }
+
+      [Browsable( true )]
+      public bool AnyBlank
+      {
+         get
+         {
+            foreach ( FieldControl fc in _fieldControls )
+            {
+               if ( fc.Blank )
+               {
+                  return true;
+               }
+            }
+
+            return false;
          }
       }
 
@@ -266,9 +282,9 @@ namespace IPAddressControlLib
 
       public byte[] GetAddressBytes()
       {
-         byte[] bytes = new byte[NumberOfFields];
+         byte[] bytes = new byte[FieldCount];
 
-         for ( int index = 0; index < NumberOfFields; ++index )
+         for ( int index = 0; index < FieldCount; ++index )
          {
             bytes[index] = _fieldControls[index].Value;
          }
@@ -280,7 +296,7 @@ namespace IPAddressControlLib
       {
          Clear();
 
-         int length = Math.Min( NumberOfFields, bytes.Length );
+         int length = Math.Min( FieldCount, bytes.Length );
 
          for ( int i = 0; i < length; ++i )
          {
@@ -288,20 +304,20 @@ namespace IPAddressControlLib
          }
       }
 
-      public void SetFieldFocus( int fieldId )
+      public void SetFieldFocus( int fieldIndex )
       {
-         if ( ( fieldId >= 0 ) && ( fieldId < NumberOfFields ) )
+         if ( ( fieldIndex >= 0 ) && ( fieldIndex < FieldCount ) )
          {
-            _fieldControls[fieldId].TakeFocus( Direction.Forward, Selection.All );
+            _fieldControls[fieldIndex].TakeFocus( Direction.Forward, Selection.All );
          }
       }
 
-      public void SetFieldRange( int fieldId, byte rangeLower, byte rangeUpper )
+      public void SetFieldRange( int fieldIndex, byte rangeLower, byte rangeUpper )
       {
-         if ( ( fieldId >= 0 ) && ( fieldId < NumberOfFields ) )
+         if ( ( fieldIndex >= 0 ) && ( fieldIndex < FieldCount ) )
          {
-            _fieldControls[fieldId].RangeLower = rangeLower;
-            _fieldControls[fieldId].RangeUpper = rangeUpper;
+            _fieldControls[fieldIndex].RangeLower = rangeLower;
+            _fieldControls[fieldIndex].RangeUpper = rangeUpper;
          }
       }
 
@@ -309,7 +325,7 @@ namespace IPAddressControlLib
       {
          StringBuilder sb = new StringBuilder();
 
-         for ( int index = 0; index < NumberOfFields; ++index )
+         for ( int index = 0; index < FieldCount; ++index )
          {
             sb.Append( _fieldControls[index].ToString() );
 
@@ -338,7 +354,7 @@ namespace IPAddressControlLib
 
             _fieldControls[index].CedeFocusEvent += new EventHandler<CedeFocusEventArgs>( OnCedeFocus );
             _fieldControls[index].FieldFocusEvent += new EventHandler<FieldFocusEventArgs>( OnFieldFocus );
-            _fieldControls[index].FieldId = index;
+            _fieldControls[index].FieldIndex = index;
             _fieldControls[index].FieldKeyPressedEvent += new KeyPressEventHandler( OnFieldKeyPressed );
             _fieldControls[index].Name = "FieldControl" + index.ToString( CultureInfo.InvariantCulture );
             _fieldControls[index].Parent = this;
@@ -347,7 +363,7 @@ namespace IPAddressControlLib
 
             Controls.Add( _fieldControls[index] );
 
-            if ( index < ( NumberOfFields - 1 ) )
+            if ( index < ( FieldCount - 1 ) )
             {
                _dotControls[index] = new DotControl();
 
@@ -634,24 +650,24 @@ namespace IPAddressControlLib
 
       private void OnCedeFocus( Object sender, CedeFocusEventArgs e )
       {
-         if ( ( e.Direction == Direction.Reverse && e.FieldId == 0 ) ||
-              ( e.Direction == Direction.Forward && e.FieldId == ( NumberOfFields - 1 ) ) )
+         if ( ( e.Direction == Direction.Reverse && e.FieldIndex == 0 ) ||
+              ( e.Direction == Direction.Forward && e.FieldIndex == ( FieldCount - 1 ) ) )
          {
             return;
          }
 
-         int fieldId = e.FieldId;
+         int fieldIndex = e.FieldIndex;
 
          if ( e.Direction == Direction.Forward )
          {
-            ++fieldId;
+            ++fieldIndex;
          }
          else
          {
-            --fieldId;
+            --fieldIndex;
          }
 
-         _fieldControls[fieldId].TakeFocus( e.Direction, e.Selection );
+         _fieldControls[fieldIndex].TakeFocus( e.Direction, e.Selection );
       }
 
       private void OnFieldFocus( Object sender, FieldFocusEventArgs e )
@@ -690,7 +706,7 @@ namespace IPAddressControlLib
          if ( null != FieldChangedEvent )
          {
             FieldChangedEventArgs args = new FieldChangedEventArgs();
-            args.FieldId = e.FieldId;
+            args.FieldIndex = e.FieldIndex;
             args.Text = e.Text;
             FieldChangedEvent( this, args );
          }
@@ -704,9 +720,9 @@ namespace IPAddressControlLib
          {
             case Keys.Back:
 
-               if ( e.FieldId > 0 )
+               if ( e.FieldIndex > 0 )
                {
-                  _fieldControls[e.FieldId-1].HandleSpecialKey( Keys.Back );
+                  _fieldControls[e.FieldIndex-1].HandleSpecialKey( Keys.Back );
                }
                break;
 
@@ -717,7 +733,7 @@ namespace IPAddressControlLib
 
             case Keys.End:
 
-               _fieldControls[NumberOfFields - 1].TakeFocus( Direction.Reverse, Selection.None );
+               _fieldControls[FieldCount - 1].TakeFocus( Direction.Reverse, Selection.None );
                break;
          }
       }
@@ -767,8 +783,8 @@ namespace IPAddressControlLib
       private bool _backColorChanged;
       private BorderStyle _borderStyle = BorderStyle.Fixed3D;
       private bool _focused;
-      private FieldControl[] _fieldControls = new FieldControl[NumberOfFields];
-      private DotControl[] _dotControls = new DotControl[NumberOfFields - 1];
+      private FieldControl[] _fieldControls = new FieldControl[FieldCount];
+      private DotControl[] _dotControls = new DotControl[FieldCount - 1];
       private bool _readOnly;
 
       private Size Fixed3DOffset = new Size( 3, 3 );
