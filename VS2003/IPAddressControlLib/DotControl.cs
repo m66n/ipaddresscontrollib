@@ -91,7 +91,7 @@ namespace IPAddressControlLib
          ResourceManager rm = new ResourceManager( "IPAddressControlLib.Strings", Assembly.GetExecutingAssembly() );
          this.Text = rm.GetString( "FieldSeparator" );
 
-         this.Size    = CalculateControlSize();
+         this.Size = CalculateControlSize();
 
          SetStyle( ControlStyles.DoubleBuffer, true );
          SetStyle( ControlStyles.UserPaint, true );
