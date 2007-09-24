@@ -47,9 +47,9 @@ namespace IPAddressControlLib
          regions = g.MeasureCharacterRanges( text,
             font, rect, stringFormat );
 
-         g.Dispose();
-
          rect = regions[0].GetBounds( g );
+
+         g.Dispose();
 
          float fudgeFactor = ( font.SizeInPoints / 8.25F ) * 3.0F;
 

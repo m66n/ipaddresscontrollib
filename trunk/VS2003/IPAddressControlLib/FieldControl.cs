@@ -48,10 +48,10 @@ namespace IPAddressControlLib
       LostFocus
    }
 
-   internal delegate bool CedeFocusHandler( int fieldId, Direction direction, Selection selection );
-   internal delegate void FieldFocusHandler( int fieldId, FocusEventType fet );
-   internal delegate void SpecialKeyHandler( int fieldId, Keys keyCode );
-   internal delegate void TextChangedHandler( int fieldId, string newText );
+   internal delegate bool CedeFocusHandler( int fieldIndex, Direction direction, Selection selection );
+   internal delegate void FieldFocusHandler( int fieldIndex, FocusEventType fet );
+   internal delegate void SpecialKeyHandler( int fieldIndex, Keys keyCode );
+   internal delegate void TextChangedHandler( int fieldIndex, string newText );
 
 	/// <summary>
 	/// Summary description for FieldControl.
@@ -69,7 +69,7 @@ namespace IPAddressControlLib
 
       #region Private Data
 
-      private int _fieldId = -1;
+      private int _fieldIndex = -1;
 
       private bool _invalidKeyDown;
 
@@ -85,15 +85,15 @@ namespace IPAddressControlLib
 
       #region Public Properties
 
-      public int FieldId
+      public int FieldIndex
       {
          get 
          {
-            return _fieldId;
+            return _fieldIndex;
          }
          set
          {
-            _fieldId = value;
+            _fieldIndex = value;
          }
       }
 
@@ -284,7 +284,7 @@ namespace IPAddressControlLib
          {
             if ( CedeFocusEvent != null )
             {
-               CedeFocusEvent( this.FieldId, Direction.Forward, Selection.All );
+               CedeFocusEvent( this.FieldIndex, Direction.Forward, Selection.All );
             }
          }
 
@@ -294,7 +294,7 @@ namespace IPAddressControlLib
             {
                if ( CedeFocusEvent != null )
                {
-                  CedeFocusEvent( this.FieldId, Direction.Backward, Selection.All );
+                  CedeFocusEvent( this.FieldIndex, Direction.Backward, Selection.All );
                }
             }
             else
@@ -302,7 +302,7 @@ namespace IPAddressControlLib
             {
                if ( CedeFocusEvent != null )
                {
-                  CedeFocusEvent( this.FieldId, Direction.Backward, Selection.None );
+                  CedeFocusEvent( this.FieldIndex, Direction.Backward, Selection.None );
                }
             }
          }
@@ -331,14 +331,14 @@ namespace IPAddressControlLib
             {
                if ( CedeFocusEvent != null )
                {
-                  CedeFocusEvent( this.FieldId, Direction.Forward, Selection.All );
+                  CedeFocusEvent( this.FieldIndex, Direction.Forward, Selection.All );
                }
             }
             else if ( SelectionLength == 0 && SelectionStart == Text.Length )
             {
                if ( CedeFocusEvent != null )
                {
-                  CedeFocusEvent( this.FieldId, Direction.Forward, Selection.None );
+                  CedeFocusEvent( this.FieldIndex, Direction.Forward, Selection.None );
                }
             }
          }
@@ -395,14 +395,14 @@ namespace IPAddressControlLib
 
          if ( this.TextChangedEvent != null )
          {
-            this.TextChangedEvent( this.FieldId, this.Text );
+            this.TextChangedEvent( this.FieldIndex, this.Text );
          }
 
          if ( this.Text.Length == this.MaxLength && this.Focused )
          {
             if ( CedeFocusEvent != null )
             {
-               CedeFocusEvent( this.FieldId, Direction.Forward, Selection.All );
+               CedeFocusEvent( this.FieldIndex, Direction.Forward, Selection.All );
             }
          }
 
@@ -475,7 +475,7 @@ namespace IPAddressControlLib
       {
          if ( null != FieldFocusEvent )
          {
-            FieldFocusEvent( FieldId, fet );
+            FieldFocusEvent( FieldIndex, fet );
          }
       }
 
@@ -483,7 +483,7 @@ namespace IPAddressControlLib
       {
          if ( null != SpecialKeyEvent )
          {
-            SpecialKeyEvent( FieldId, keyCode );
+            SpecialKeyEvent( FieldIndex, keyCode );
          }
       }
 

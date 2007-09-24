@@ -296,6 +296,11 @@ namespace IPAddressControlLib
       {
          Clear();
 
+         if ( bytes == null )
+         {
+            return;
+         }
+
          int length = Math.Min( FieldCount, bytes.Length );
 
          for ( int i = 0; i < length; ++i )
