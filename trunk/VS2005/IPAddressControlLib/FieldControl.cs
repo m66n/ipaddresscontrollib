@@ -42,19 +42,19 @@ namespace IPAddressControlLib
 
    internal class CedeFocusEventArgs : EventArgs
    {
-      private int _fieldId;
+      private int _fieldIndex;
       private Direction _direction;
       private Selection _selection;
 
-      public int FieldId
+      public int FieldIndex
       {
          get
          {
-            return _fieldId;
+            return _fieldIndex;
          }
          set
          {
-            _fieldId = value;
+            _fieldIndex = value;
          }
       }
 
@@ -91,20 +91,22 @@ namespace IPAddressControlLib
 
    internal class FieldFocusEventArgs : EventArgs
    {
-      private int _fieldId;
+      //private int _fieldIndex;
       private FocusEventType _focusEventType;
 
-      public int FieldId
+      /*
+      public int FieldIndex
       {
          get
          {
-            return _fieldId;
+            return _fieldIndex;
          }
          set
          {
-            _fieldId = value;
+            _fieldIndex = value;
          }
       }
+      */
 
       public FocusEventType FocusEventType
       {
@@ -121,18 +123,18 @@ namespace IPAddressControlLib
 
    internal class SpecialKeyEventArgs : EventArgs
    {
-      private int _fieldId;
+      private int _fieldIndex;
       private Keys _keyCode;
 
-      public int FieldId
+      public int FieldIndex
       {
          get
          {
-            return _fieldId;
+            return _fieldIndex;
          }
          set
          {
-            _fieldId = value;
+            _fieldIndex = value;
          }
       }
 
@@ -151,18 +153,18 @@ namespace IPAddressControlLib
 
    internal class TextChangedEventArgs : EventArgs
    {
-      private int _fieldId;
+      private int _fieldIndex;
       private String _text;
 
-      public int FieldId
+      public int FieldIndex
       {
          get
          {
-            return _fieldId;
+            return _fieldIndex;
          }
          set
          {
-            _fieldId = value;
+            _fieldIndex = value;
          }
       }
 
@@ -208,15 +210,15 @@ namespace IPAddressControlLib
          }
       }
 
-      public int FieldId
+      public int FieldIndex
       {
          get
          {
-            return _fieldId;
+            return _fieldIndex;
          }
          set
          {
-            _fieldId = value;
+            _fieldIndex = value;
          }
       }
 
@@ -510,7 +512,7 @@ namespace IPAddressControlLib
          if ( null != TextChangedEvent )
          {
             TextChangedEventArgs args = new TextChangedEventArgs();
-            args.FieldId = FieldId;
+            args.FieldIndex = FieldIndex;
             args.Text = Text;
             TextChangedEvent( this, args );
          }
@@ -595,7 +597,7 @@ namespace IPAddressControlLib
          if ( null != CedeFocusEvent )
          {
             CedeFocusEventArgs args = new CedeFocusEventArgs();
-            args.FieldId = FieldId;
+            args.FieldIndex = FieldIndex;
             args.Direction = direction;
             args.Selection = selection;
             CedeFocusEvent( this, args );
@@ -607,7 +609,7 @@ namespace IPAddressControlLib
          if ( null != FieldFocusEvent )
          {
             FieldFocusEventArgs args = new FieldFocusEventArgs();
-            args.FieldId = FieldId;
+            //args.FieldIndex = FieldIndex;
             args.FocusEventType = fet;
             FieldFocusEvent( this, args );
          }
@@ -619,7 +621,7 @@ namespace IPAddressControlLib
          {
             SpecialKeyEventArgs args = new SpecialKeyEventArgs();
 
-            args.FieldId = FieldId;
+            args.FieldIndex = FieldIndex;
             args.KeyCode = keyCode;
             SpecialKeyEvent( this, args );
          }
@@ -647,12 +649,12 @@ namespace IPAddressControlLib
 
       #region Private Data
 
-      private int _fieldId = -1;
+      private int _fieldIndex = -1;
       private bool _invalidKeyDown;
       private byte _rangeLower; // = MinimumValue;  // this is removed for FxCop approval
       private byte _rangeUpper = MaximumValue;
 
-      private TextFormatFlags _textFormatFlags = TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix |
+      private TextFormatFlags _textFormatFlags = TextFormatFlags.HorizontalCenter |
          TextFormatFlags.SingleLine | TextFormatFlags.NoPadding;
 
       #endregion // Private Data
