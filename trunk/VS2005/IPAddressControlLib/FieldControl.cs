@@ -224,8 +224,15 @@ namespace IPAddressControlLib
       {
          get
          {
-            return TextRenderer.MeasureText( Graphics.FromHwnd( Handle ),
-               Properties.Resources.FieldMeasureText, Font, Size, TextFormatFlags.NoPadding );
+            Graphics g = Graphics.FromHwnd( Handle );
+
+            Size minimumSize = TextRenderer.MeasureText( g,
+               Properties.Resources.FieldMeasureText, Font, Size,
+               _textFormatFlags );
+
+            g.Dispose();
+
+            return minimumSize;
          }
       }
 
@@ -644,6 +651,9 @@ namespace IPAddressControlLib
       private bool _invalidKeyDown;
       private byte _rangeLower; // = MinimumValue;  // this is removed for FxCop approval
       private byte _rangeUpper = MaximumValue;
+
+      private TextFormatFlags _textFormatFlags = TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix |
+         TextFormatFlags.SingleLine | TextFormatFlags.NoPadding;
 
       #endregion // Private Data
    }

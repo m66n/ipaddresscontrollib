@@ -35,9 +35,16 @@ namespace IPAddressControlLib
       public override Size MinimumSize
       {
          get
-         {            
-            return TextRenderer.MeasureText( Graphics.FromHwnd( Handle ), Text,
-               Font, Size, _textFormatFlags );
+         {
+            Graphics g = Graphics.FromHwnd( Handle );
+
+            Size minimumSize = TextRenderer.MeasureText( g,
+               Text, Font, Size,
+               _textFormatFlags );
+
+            g.Dispose();
+
+            return minimumSize;
          }
       }
 
