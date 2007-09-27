@@ -42,25 +42,13 @@ namespace IPAddressControlLib
       All
    };
 
-   internal enum FocusEventType
-   {
-      GotFocus,
-      LostFocus
-   }
-
    internal delegate bool CedeFocusHandler( int fieldIndex, Direction direction, Selection selection );
-   internal delegate void FieldFocusHandler( int fieldIndex, FocusEventType fet );
    internal delegate void SpecialKeyHandler( int fieldIndex, Keys keyCode );
    internal delegate void TextChangedHandler( int fieldIndex, string newText );
 
-	/// <summary>
-	/// Summary description for FieldControl.
-	/// </summary>
 	internal class FieldControl : System.Windows.Forms.TextBox
 	{
       public event CedeFocusHandler CedeFocusEvent;
-      public event FieldFocusHandler FieldFocusEvent;
-      public event KeyPressEventHandler FieldKeyPressedEvent;
       public event SpecialKeyHandler SpecialKeyEvent;
       public event TextChangedHandler TextChangedEvent;
 
@@ -76,14 +64,22 @@ namespace IPAddressControlLib
       private int _rangeLower;  // using " = MinimumValue; " here is flagged by FxCop
       private int _rangeUpper = MaximumValue;
 
-		/// <summary> 
-		/// Required designer variable.
-		/// </summary>
-		private System.ComponentModel.Container components = null;
-
       #endregion
 
       #region Public Properties
+
+      public bool Blank
+      {
+         get
+         {
+            if ( TextLength > 0 )
+            {
+               return false;
+            }
+
+            return true;
+         }
+      }
 
       public int FieldIndex
       {
@@ -94,20 +90,6 @@ namespace IPAddressControlLib
          set
          {
             _fieldIndex = value;
-         }
-      }
-
-      public bool Blank
-      {
-         get
-         {
-            if ( this.Text != null &&
-                 this.Text.Length > 0 )
-            {
-               return false;
-            }
-
-            return true;
          }
       }
 
@@ -226,11 +208,6 @@ namespace IPAddressControlLib
 
 		public FieldControl()
 		{
-			// This call is required by the Windows.Forms Form Designer.
-			InitializeComponent();
-
-			// TODO: Add any initialization after the InitializeComponent call
-
          this.AutoSize         = false;
          this.BorderStyle      = BorderStyle.None;
          this.MaxLength        = 3;
@@ -244,21 +221,9 @@ namespace IPAddressControlLib
 
       #region Overrides
 
-      protected override void OnGotFocus( EventArgs e )
-      {
-         base.OnGotFocus( e );
-         SendFieldFocusEvent( FocusEventType.GotFocus );
-      }
-
       protected override void OnKeyDown( KeyEventArgs e )
       {
          base.OnKeyDown( e );
-
-         if ( FieldKeyPressedEvent != null )
-         {
-            KeyPressEventArgs args = new KeyPressEventArgs( Convert.ToChar( e.KeyCode, CultureInfo.InvariantCulture ) );
-            FieldKeyPressedEvent( this, args );
-         }
 
          if ( e.KeyCode == Keys.Home || 
               e.KeyCode == Keys.End )
@@ -354,12 +319,6 @@ namespace IPAddressControlLib
          base.OnKeyPress( e );
       }
 
-      protected override void OnLostFocus( EventArgs e )
-      {
-         base.OnLostFocus( e );
-         SendFieldFocusEvent( FocusEventType.LostFocus );
-      }
-
       protected override void OnTextChanged( EventArgs e )
       {
          if ( !this.Blank )
@@ -422,6 +381,18 @@ namespace IPAddressControlLib
          base.OnValidating( e );
       }
 
+      protected override void WndProc( ref Message m )
+      {
+         switch ( m.Msg )
+         {
+            case NativeMethods.WM_CONTEXTMENU:
+               return;
+         }
+
+         base.WndProc( ref m );
+      }
+
+
       #endregion
 
       #region Private Functions
@@ -471,14 +442,6 @@ namespace IPAddressControlLib
          return false;
       }
 
-      private void SendFieldFocusEvent( FocusEventType fet )
-      {
-         if ( null != FieldFocusEvent )
-         {
-            FieldFocusEvent( FieldIndex, fet );
-         }
-      }
-
       private void SendSpecialKeyEvent( Keys keyCode )
       {
          if ( null != SpecialKeyEvent )
@@ -494,8 +457,7 @@ namespace IPAddressControlLib
          {
             return true;
          }
-         else
-            if ( e.Modifiers == Keys.Control &&
+         else if ( e.Modifiers == Keys.Control &&
                  ( e.KeyCode == Keys.C ||
                    e.KeyCode == Keys.V ||
                    e.KeyCode == Keys.X ) )
@@ -532,39 +494,6 @@ namespace IPAddressControlLib
             }
          }
       }
-
-      #endregion
-
-      #region Generated Code
-
-		/// <summary> 
-		/// Clean up any resources being used.
-		/// </summary>
-		protected override void Dispose( bool disposing )
-		{
-			if( disposing )
-			{
-				if(components != null)
-				{
-					components.Dispose();
-				}
-			}
-			base.Dispose( disposing );
-		}
-
-		#region Component Designer generated code
-		/// <summary> 
-		/// Required method for Designer support - do not modify 
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-         // 
-         // FieldControl
-         // 
-         this.Name = "FieldControl";
-      }
-		#endregion
 
       #endregion
 	}

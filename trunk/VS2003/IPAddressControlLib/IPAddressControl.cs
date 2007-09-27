@@ -73,17 +73,14 @@ namespace IPAddressControlLib
       #region Private Data
 
       private FieldControl[] _fieldControls = new FieldControl[FieldCount];
-      private DotControl[] _dotControls     = new DotControl[FieldCount-1];
+      private DotControl[] _dotControls = new DotControl[FieldCount-1];
 
       private bool _autoHeight = true;
       private BorderStyle _borderStyle = BorderStyle.Fixed3D;
       private bool _focused;
       private bool _readOnly;
 
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
-		private System.ComponentModel.Container components = null;
+      private bool _hasMouse;
 
       #endregion
 
@@ -354,45 +351,233 @@ namespace IPAddressControlLib
 
 		public IPAddressControl()
 		{
-         InitializeComponent();
-
 			for ( int index = 0; index < _fieldControls.Length; ++index )
          {
             _fieldControls[index] = new FieldControl();
-            _fieldControls[index].Name = "fieldControl" + index.ToString( CultureInfo.InvariantCulture );
+
             _fieldControls[index].CreateControl();
+
+            _fieldControls[index].Name = "fieldControl" + index.ToString( CultureInfo.InvariantCulture );
             _fieldControls[index].Parent = this;
             _fieldControls[index].FieldIndex = index;
-            _fieldControls[index].CedeFocusEvent += new CedeFocusHandler( this.OnCedeFocus );
-            _fieldControls[index].FieldFocusEvent += new FieldFocusHandler( OnFieldFocus );
-            _fieldControls[index].FieldKeyPressedEvent += new KeyPressEventHandler( OnFieldKeyPressed );
-            _fieldControls[index].SpecialKeyEvent += new SpecialKeyHandler( this.OnSpecialKey );
-            _fieldControls[index].TextChangedEvent += new TextChangedHandler( this.OnFieldTextChanged );
+
+            _fieldControls[index].CedeFocusEvent += new CedeFocusHandler( OnCedeFocus );
+            _fieldControls[index].Click += new EventHandler( OnSubControlClicked );
+            _fieldControls[index].DoubleClick += new EventHandler( OnSubControlDoubleClicked );
+            _fieldControls[index].GotFocus += new EventHandler( OnFieldGotFocus );
+            _fieldControls[index].KeyPress += new KeyPressEventHandler( OnFieldKeyPressed );
+            _fieldControls[index].LostFocus += new EventHandler( OnFieldLostFocus );
+            _fieldControls[index].MouseEnter += new EventHandler( OnSubControlMouseEntered );
+            _fieldControls[index].MouseHover += new EventHandler( OnSubControlMouseHovered );
+            _fieldControls[index].MouseLeave += new EventHandler( OnSubControlMouseLeft );
+            _fieldControls[index].MouseMove += new MouseEventHandler( OnSubControlMouseMoved );
+            _fieldControls[index].SpecialKeyEvent += new SpecialKeyHandler( OnSpecialKey );
+            _fieldControls[index].TextChangedEvent += new TextChangedHandler( OnFieldTextChanged );
+
             this.Controls.Add( _fieldControls[index] );
          }
          
          for ( int index = 0; index < _dotControls.Length; ++index )
          {
             _dotControls[index] = new DotControl();
-            _dotControls[index].Name = "dotControl" + index.ToString( CultureInfo.InvariantCulture );
+
             _dotControls[index].CreateControl();
+
+            _dotControls[index].Name = "dotControl" + index.ToString( CultureInfo.InvariantCulture );
             _dotControls[index].Parent = this;
             _dotControls[index].IgnoreTheme = ( this.BorderStyle != BorderStyle.Fixed3D );
+
+            _dotControls[index].Click += new EventHandler( OnSubControlClicked );
+            _dotControls[index].DoubleClick += new EventHandler( OnSubControlDoubleClicked );
+            _dotControls[index].MouseEnter += new EventHandler( OnSubControlMouseEntered );
+            _dotControls[index].MouseHover += new EventHandler( OnSubControlMouseHovered );
+            _dotControls[index].MouseLeave += new EventHandler( OnSubControlMouseLeft );
+            _dotControls[index].MouseMove += new MouseEventHandler( OnSubControlMouseMoved );
+
             this.Controls.Add( _dotControls[index] );
          }
 
          Size = MinimumSize;
 
-         SetStyle( ControlStyles.ResizeRedraw, true );
-         SetStyle( ControlStyles.UserPaint, true );
+         SetStyle( ControlStyles.AllPaintingInWmPaint, true );
          SetStyle( ControlStyles.ContainerControl, true );
+         SetStyle( ControlStyles.DoubleBuffer, true );
+         SetStyle( ControlStyles.ResizeRedraw, true );
+         SetStyle( ControlStyles.Selectable, true );
+         SetStyle( ControlStyles.UserPaint, true );
 
          LayoutControls();
 		}
 
       #endregion
 
+      #region Protected Overrides
+
+      protected override void OnBackColorChanged( EventArgs e )
+      {
+         foreach ( FieldControl fc in _fieldControls )
+         {
+            if ( fc != null )
+            {
+               fc.BackColor = this.BackColor;
+            }
+         }
+
+         foreach ( DotControl dc in _dotControls )
+         {
+            if ( dc != null )
+            {
+               dc.BackColor = this.BackColor;
+               dc.Invalidate();
+            }
+         }
+
+         base.OnBackColorChanged( e );
+
+         Invalidate();
+      }
+
+      protected override void OnFontChanged(EventArgs e)
+      {
+         foreach ( FieldControl fc in _fieldControls )
+         {
+            fc.SetFont( this.Font );
+         }
+
+         foreach ( DotControl dc in _dotControls )
+         {
+            dc.SetFont( this.Font );
+         }
+
+         AdjustSize();
+         LayoutControls();
+
+         base.OnFontChanged( e );
+
+         Invalidate();
+      }
+
+      protected override void OnForeColorChanged( EventArgs e )
+      {
+         foreach ( FieldControl fc in _fieldControls )
+         {
+            fc.ForeColor = this.ForeColor;
+         }
+
+         foreach ( DotControl dc in _dotControls )
+         {
+            dc.ForeColor = this.ForeColor;
+         }
+
+         base.OnForeColorChanged( e );
+
+         Invalidate( true );
+      }
+
+      protected override void OnGotFocus( EventArgs e )
+      {
+         base.OnGotFocus( e );
+         _focused = true;
+         _fieldControls[0].TakeFocus( Direction.Forward, Selection.All );
+      }
+
+      protected override void OnLostFocus( EventArgs e )
+      {
+         if ( !Focused )
+         {
+            _focused = false;
+            base.OnLostFocus( e );
+         }
+      }
+
+      protected override void OnMouseEnter( EventArgs e )
+      {
+         Cursor = Cursors.IBeam;
+
+         if ( !_hasMouse )
+         {
+            _hasMouse = true;
+            base.OnMouseEnter( e );
+         }
+      }
+
+      protected override void OnMouseLeave( EventArgs e )
+      {
+         if ( !HasMouse )
+         {
+            base.OnMouseLeave( e );
+            _hasMouse = false;
+         }
+      }
+
+      protected override void OnPaint( PaintEventArgs e )
+      {
+         bool themed = NativeMethods.IsThemed();
+
+         if ( DesignMode || !themed || ( themed && BorderStyle != BorderStyle.Fixed3D ) )
+         {
+            OnPaintStandard( e );
+         }
+         else
+         {
+            OnPaintThemed( e );
+         }
+
+         base.OnPaint( e );
+      }
+
+      protected override void OnSizeChanged( EventArgs e )
+      {
+         LayoutControls();
+         base.OnSizeChanged( e );
+      }
+
+      [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)] 
+      protected override void WndProc( ref Message m )
+      {
+         switch ( m.Msg )
+         {
+            case NativeMethods.WM_WINDOWPOSCHANGING:
+               
+               NativeMethods.WINDOWPOS lParam = (NativeMethods.WINDOWPOS)m.GetLParam( typeof( NativeMethods.WINDOWPOS ) );
+
+               if ( lParam.cx < MinimumSize.Width )
+               {
+                  lParam.flags |= NativeMethods.SWP_NOMOVE;
+                  lParam.cx = MinimumSize.Width;
+               }
+
+               if ( lParam.cy < MinimumSize.Height )
+               {
+                  lParam.flags |= NativeMethods.SWP_NOMOVE;
+                  lParam.cy = MinimumSize.Height;
+               }
+
+               if ( AutoHeight && lParam.cy != MinimumSize.Height )
+               {
+                  lParam.flags |= NativeMethods.SWP_NOMOVE;
+                  lParam.cy = MinimumSize.Height;
+               }
+                 
+               Marshal.StructureToPtr( lParam, m.LParam, true );
+
+               break;
+         }
+
+         base.WndProc( ref m );
+      }
+
+      #endregion
+
       #region Private Properties
+
+      private bool HasMouse
+      {
+         get
+         {
+            return DisplayRectangle.Contains( PointToClient( MousePosition ) );
+         }
+      }
 
       private Size MinimumSize
       {
@@ -557,30 +742,27 @@ namespace IPAddressControlLib
          return true;
       }
 
-      private void OnFieldFocus( int fieldIndex, FocusEventType fet )
+      private void OnFieldGotFocus( object sender, EventArgs e )
       {
-         switch ( fet )
+         if ( !_focused )
          {
-            case FocusEventType.GotFocus:
-
-               if ( !_focused )
-               {
-                  _focused = true;
-                  base.OnGotFocus( EventArgs.Empty );
-               }
-
-               break;
-
-            case FocusEventType.LostFocus:
-
-               if ( !Focused )
-               {
-                  _focused = false;
-                  base.OnLostFocus( EventArgs.Empty );
-               }
-
-               break;
+            _focused = true;
+            base.OnGotFocus( e );
          }
+      }
+
+      private void OnFieldLostFocus( object sender, EventArgs e )
+      {
+         if ( !Focused )
+         {
+            base.OnLostFocus( e );
+            _focused = false;
+         }
+      }
+
+      private void OnFieldKeyPressed( object sender, KeyPressEventArgs e )
+      {
+         OnKeyPress( e );
       }
 
       private void OnFieldTextChanged( int fieldIndex, string text )
@@ -594,147 +776,6 @@ namespace IPAddressControlLib
          }
 
          OnTextChanged( EventArgs.Empty );
-      }
-
-      private void Parse( string text )
-      {
-         Clear();
-
-         if ( null == text )
-         {
-            return;
-         }
-
-         int textIndex = 0;
-
-         int index = 0;
-
-         for ( index = 0; index < _dotControls.Length; ++index )
-         {
-            int findIndex = text.IndexOf( _dotControls[index].Text, textIndex );
-
-            if ( findIndex >= 0 )
-            {
-               _fieldControls[index].Text = text.Substring( textIndex, findIndex - textIndex );
-               textIndex = findIndex + _dotControls[index].Text.Length;
-            }
-            else
-            {
-               break;
-            }
-         }
-
-         _fieldControls[index].Text = text.Substring( textIndex );
-      }
-
-      private void OnFieldKeyPressed( object sender, KeyPressEventArgs e )
-      {
-         OnKeyPress( e );
-      }
-
-      private void OnSpecialKey( int fieldIndex, Keys keyCode )
-      {
-         switch ( keyCode )
-         {
-            case Keys.Back:
-
-               if ( fieldIndex > 0 )
-               {
-                  _fieldControls[fieldIndex-1].HandleSpecialKey( Keys.Back );
-               }
-               break;
-
-            case Keys.Home:
-
-               _fieldControls[0].TakeFocus( Direction.Forward, Selection.None );
-               break;
-
-            case Keys.End:
-
-               _fieldControls[FieldCount - 1].TakeFocus( Direction.Backward, Selection.None );
-               break;
-         }
-      }
-
-      #endregion
-
-      #region Protected Overrides
-
-      protected override void OnBackColorChanged( EventArgs e )
-      {
-         foreach ( FieldControl fc in _fieldControls )
-         {
-            if ( fc != null )
-            {
-               fc.BackColor = this.BackColor;
-            }
-         }
-
-         foreach ( DotControl dc in _dotControls )
-         {
-            if ( dc != null )
-            {
-               dc.BackColor = this.BackColor;
-               dc.Invalidate();
-            }
-         }
-
-         base.OnBackColorChanged( e );
-
-         Invalidate();
-      }
-
-      protected override void OnFontChanged(EventArgs e)
-      {
-         foreach ( FieldControl fc in _fieldControls )
-         {
-            fc.SetFont( this.Font );
-         }
-
-         foreach ( DotControl dc in _dotControls )
-         {
-            dc.SetFont( this.Font );
-         }
-
-         AdjustSize();
-         LayoutControls();
-
-         base.OnFontChanged( e );
-
-         Invalidate();
-      }
-
-      protected override void OnForeColorChanged( EventArgs e )
-      {
-         foreach ( FieldControl fc in _fieldControls )
-         {
-            fc.ForeColor = this.ForeColor;
-         }
-
-         foreach ( DotControl dc in _dotControls )
-         {
-            dc.ForeColor = this.ForeColor;
-         }
-
-         base.OnForeColorChanged( e );
-
-         Invalidate( true );
-      }
-
-      protected override void OnGotFocus( EventArgs e )
-      {
-         base.OnGotFocus( e );
-         _focused = true;
-         _fieldControls[0].TakeFocus( Direction.Forward, Selection.All );
-      }
-
-      protected override void OnLostFocus( EventArgs e )
-      {
-         if ( !Focused )
-         {
-            _focused = false;
-            base.OnLostFocus( e );
-         }
       }
 
       private void OnPaintStandard( PaintEventArgs e )
@@ -824,7 +865,7 @@ namespace IPAddressControlLib
                state = NativeMethods.ETS_DISABLED;
             }
             else
-            if ( ReadOnly )
+               if ( ReadOnly )
             {
                state = NativeMethods.ETS_READONLY;
             }
@@ -838,7 +879,7 @@ namespace IPAddressControlLib
             }
          }
          else
-         if ( Enabled & !ReadOnly )
+            if ( Enabled & !ReadOnly )
          {
             IntPtr hTheme = NativeMethods.OpenThemeData( this.Handle, "Edit" );
 
@@ -888,99 +929,96 @@ namespace IPAddressControlLib
          e.Graphics.ReleaseHdc( hdc );
       }
 
-      protected override void OnPaint( PaintEventArgs e )
+      private void Parse( string text )
       {
-         bool themed = NativeMethods.IsThemed();
+         Clear();
 
-         if ( DesignMode || !themed || ( themed && BorderStyle != BorderStyle.Fixed3D ) )
+         if ( null == text )
          {
-            OnPaintStandard( e );
-         }
-         else
-         {
-            OnPaintThemed( e );
+            return;
          }
 
-         base.OnPaint( e );
-      }
+         int textIndex = 0;
 
-      protected override void OnSizeChanged( EventArgs e )
-      {
-         LayoutControls();
-         base.OnSizeChanged( e );
-      }
+         int index = 0;
 
-      [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)] 
-      protected override void WndProc( ref Message m )
-      {
-         switch ( m.Msg )
+         for ( index = 0; index < _dotControls.Length; ++index )
          {
-            case NativeMethods.WM_WINDOWPOSCHANGING:
-               
-               NativeMethods.WINDOWPOS lParam = (NativeMethods.WINDOWPOS)m.GetLParam( typeof( NativeMethods.WINDOWPOS ) );
+            int findIndex = text.IndexOf( _dotControls[index].Text, textIndex );
 
-               if ( lParam.cx < MinimumSize.Width )
+            if ( findIndex >= 0 )
+            {
+               _fieldControls[index].Text = text.Substring( textIndex, findIndex - textIndex );
+               textIndex = findIndex + _dotControls[index].Text.Length;
+            }
+            else
+            {
+               break;
+            }
+         }
+
+         _fieldControls[index].Text = text.Substring( textIndex );
+      }
+
+      private void OnSubControlClicked( object sender, EventArgs e )
+      {
+         OnClick( e );
+      }
+
+      private void OnSubControlDoubleClicked( object sender, EventArgs e )
+      {
+         OnDoubleClick( e );
+      }
+
+      private void OnSubControlMouseEntered( object sender, EventArgs e )
+      {
+         if ( !_hasMouse )
+         {
+            OnMouseEnter( e );
+         }
+      }
+
+      private void OnSubControlMouseHovered( object sender, EventArgs e )
+      {
+         OnMouseHover( e );
+      }
+
+      private void OnSubControlMouseLeft( object sender, EventArgs e )
+      {
+         if ( !HasMouse )
+         {
+            OnMouseLeave( e );
+         }
+      }
+
+      private void OnSubControlMouseMoved( object sender, MouseEventArgs e )
+      {
+         OnMouseMove( e );
+      }
+
+      private void OnSpecialKey( int fieldIndex, Keys keyCode )
+      {
+         switch ( keyCode )
+         {
+            case Keys.Back:
+
+               if ( fieldIndex > 0 )
                {
-                  lParam.flags |= NativeMethods.SWP_NOMOVE;
-                  lParam.cx = MinimumSize.Width;
+                  _fieldControls[fieldIndex-1].HandleSpecialKey( Keys.Back );
                }
+               break;
 
-               if ( lParam.cy < MinimumSize.Height )
-               {
-                  lParam.flags |= NativeMethods.SWP_NOMOVE;
-                  lParam.cy = MinimumSize.Height;
-               }
+            case Keys.Home:
 
-               if ( AutoHeight && lParam.cy != MinimumSize.Height )
-               {
-                  lParam.flags |= NativeMethods.SWP_NOMOVE;
-                  lParam.cy = MinimumSize.Height;
-               }
-                 
-               Marshal.StructureToPtr( lParam, m.LParam, true );
+               _fieldControls[0].TakeFocus( Direction.Forward, Selection.None );
+               break;
 
+            case Keys.End:
+
+               _fieldControls[FieldCount - 1].TakeFocus( Direction.Backward, Selection.None );
                break;
          }
-
-         base.WndProc( ref m );
       }
-
-      #endregion
-
-      #region Generated Code
-
-		/// <summary> 
-		/// Clean up any resources being used.
-		/// </summary>
-		protected override void Dispose( bool disposing )
-		{
-			if( disposing )
-			{
-				if(components != null)
-				{
-					components.Dispose();
-				}
-			}
-			base.Dispose( disposing );
-		}
-
-		#region Component Designer generated code
-		/// <summary> 
-		/// Required method for Designer support - do not modify 
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-         // 
-         // IPAddressControl
-         // 
-         this.BackColor = System.Drawing.SystemColors.Window;
-         this.Name = "IPAddressControl";
-         this.DragEnter += new System.Windows.Forms.DragEventHandler(this.IPAddressControl_DragEnter);
-         this.DragDrop += new System.Windows.Forms.DragEventHandler(this.IPAddressControl_DragDrop);
-
-      }
-		#endregion
 
       #endregion
    }

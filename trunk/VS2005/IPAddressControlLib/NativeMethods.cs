@@ -70,6 +70,5 @@ namespace IPAddressControlLib
          public byte tmPitchAndFamily;
          public byte tmCharSet;
       }
-
    }
 }
