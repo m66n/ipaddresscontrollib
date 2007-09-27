@@ -63,7 +63,7 @@ namespace IPAddressControlLib
    }
 
    [DesignerAttribute( typeof( IPAddressControlDesigner ) )]
-   public partial class IPAddressControl : UserControl
+   public class IPAddressControl : UserControl
    {
       #region Public Constants
 
@@ -402,16 +402,15 @@ namespace IPAddressControlLib
             }
          }
 
-         InitializeComponent();
-
          SetStyle( ControlStyles.AllPaintingInWmPaint, true );
          SetStyle( ControlStyles.ContainerControl, true );
          SetStyle( ControlStyles.OptimizedDoubleBuffer, true );
          SetStyle( ControlStyles.ResizeRedraw, true );
-         SetStyle( ControlStyles.Selectable, true );
          SetStyle( ControlStyles.UserPaint, true );
 
          _referenceTextBox.AutoSize = true;
+
+         Cursor = Cursors.IBeam;
 
          Size = MinimumSize;
 
@@ -453,8 +452,6 @@ namespace IPAddressControlLib
 
       protected override void OnMouseEnter( EventArgs e )
       {
-         Cursor = Cursors.IBeam;
-
          if ( !_hasMouse )
          {
             _hasMouse = true;
@@ -806,10 +803,7 @@ namespace IPAddressControlLib
 
       private void OnSubControlMouseEntered( object sender, EventArgs e )
       {
-         if ( !_hasMouse )
-         {
-            OnMouseEnter( e );
-         }
+         OnMouseEnter( e );
       }
 
       private void OnSubControlMouseHovered( object sender, EventArgs e )
@@ -819,10 +813,7 @@ namespace IPAddressControlLib
 
       private void OnSubControlMouseLeft( object sender, EventArgs e )
       {
-         if ( !HasMouse )
-         {
-            OnMouseLeave( e );
-         }
+         OnMouseLeave( e );
       }
 
       private void OnSubControlMouseMoved( object sender, MouseEventArgs e )
