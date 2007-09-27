@@ -397,13 +397,13 @@ namespace IPAddressControlLib
             this.Controls.Add( _dotControls[index] );
          }
 
+         Cursor = Cursors.IBeam;
          Size = MinimumSize;
 
          SetStyle( ControlStyles.AllPaintingInWmPaint, true );
          SetStyle( ControlStyles.ContainerControl, true );
          SetStyle( ControlStyles.DoubleBuffer, true );
          SetStyle( ControlStyles.ResizeRedraw, true );
-         SetStyle( ControlStyles.Selectable, true );
          SetStyle( ControlStyles.UserPaint, true );
 
          LayoutControls();
@@ -492,8 +492,6 @@ namespace IPAddressControlLib
 
       protected override void OnMouseEnter( EventArgs e )
       {
-         Cursor = Cursors.IBeam;
-
          if ( !_hasMouse )
          {
             _hasMouse = true;
@@ -972,10 +970,7 @@ namespace IPAddressControlLib
 
       private void OnSubControlMouseEntered( object sender, EventArgs e )
       {
-         if ( !_hasMouse )
-         {
-            OnMouseEnter( e );
-         }
+         OnMouseEnter( e );
       }
 
       private void OnSubControlMouseHovered( object sender, EventArgs e )
@@ -985,10 +980,7 @@ namespace IPAddressControlLib
 
       private void OnSubControlMouseLeft( object sender, EventArgs e )
       {
-         if ( !HasMouse )
-         {
-            OnMouseLeave( e );
-         }
+         OnMouseLeave( e );
       }
 
       private void OnSubControlMouseMoved( object sender, MouseEventArgs e )

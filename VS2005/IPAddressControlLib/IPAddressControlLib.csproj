@@ -48,9 +48,6 @@
     <Compile Include="IPAddressControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="IPAddressControl.Designer.cs">
-      <DependentUpon>IPAddressControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="IPAddressControlDesigner.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
