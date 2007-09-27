@@ -76,16 +76,16 @@ namespace IPAddressControlLib
 
       public DotControl()
       {
-         SetStyle( ControlStyles.ResizeRedraw, true );
-         SetStyle( ControlStyles.UserPaint, true );
-         SetStyle( ControlStyles.OptimizedDoubleBuffer, true );
-         SetStyle( ControlStyles.AllPaintingInWmPaint, true );
-
          Text = Properties.Resources.FieldSeparator;
 
          BackColor = SystemColors.Window;
          Size = MinimumSize;
          TabStop = false;
+
+         SetStyle( ControlStyles.AllPaintingInWmPaint, true );
+         SetStyle( ControlStyles.OptimizedDoubleBuffer, true );
+         SetStyle( ControlStyles.ResizeRedraw, true );
+         SetStyle( ControlStyles.UserPaint, true );
       }
 
       #endregion // Constructors

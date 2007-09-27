@@ -137,6 +137,7 @@ namespace IPAddressControlLib
       // User-related
 
       public const int WM_WINDOWPOSCHANGING = 0x0046;
+      public const int WM_CONTEXTMENU = 0x007b;
 
       public const uint SWP_NOMOVE = 0x0002;
 

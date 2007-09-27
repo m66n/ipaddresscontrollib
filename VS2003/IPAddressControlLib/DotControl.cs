@@ -31,18 +31,22 @@ using System.Windows.Forms;
 
 namespace IPAddressControlLib
 {
-	/// <summary>
-	/// Summary description for DotControl.
-	/// </summary>
 	internal class DotControl : System.Windows.Forms.Control
 	{
-		/// <summary> 
-		/// Required designer variable.
-		/// </summary>
-		private System.ComponentModel.Container components = null;
-
       private bool _readOnly;
       private bool _ignoreTheme;
+
+      public bool IgnoreTheme
+      {
+         get 
+         {
+            return _ignoreTheme;
+         }
+         set 
+         {
+            _ignoreTheme = value;
+         }
+      }
 
       public bool ReadOnly
       {
@@ -54,18 +58,6 @@ namespace IPAddressControlLib
          {
             _readOnly = value;
             Invalidate();
-         }
-      }
-
-      public bool IgnoreTheme
-      {
-         get 
-         {
-            return _ignoreTheme;
-         }
-         set 
-         {
-            _ignoreTheme = value;
          }
       }
 
@@ -82,9 +74,6 @@ namespace IPAddressControlLib
 
 		public DotControl()
 		{
-			// This call is required by the Windows.Forms Form Designer.
-			InitializeComponent();
-
          this.Font    = Control.DefaultFont;
          this.TabStop = false;
 
@@ -93,9 +82,10 @@ namespace IPAddressControlLib
 
          this.Size = CalculateControlSize();
 
-         SetStyle( ControlStyles.DoubleBuffer, true );
-         SetStyle( ControlStyles.UserPaint, true );
          SetStyle( ControlStyles.AllPaintingInWmPaint, true );
+         SetStyle( ControlStyles.DoubleBuffer, true );
+         SetStyle( ControlStyles.ResizeRedraw, true );
+         SetStyle( ControlStyles.UserPaint, true );
 		}
 
       protected override void OnFontChanged(EventArgs e)
@@ -291,36 +281,5 @@ namespace IPAddressControlLib
 
          base.OnPaint( e );
       }
-
-		/// <summary> 
-		/// Clean up any resources being used.
-		/// </summary>
-		protected override void Dispose( bool disposing )
-		{
-			if( disposing )
-			{
-				if(components != null)
-				{
-					components.Dispose();
-				}
-			}
-			base.Dispose( disposing );
-		}
-
-   	#region Component Designer generated code
-		/// <summary> 
-		/// Required method for Designer support - do not modify 
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-         // 
-         // DotControl
-         // 
-         this.Name = "DotControl";
-         this.Size = new System.Drawing.Size(8, 17);
-
-      }
-		#endregion
 	}
 }

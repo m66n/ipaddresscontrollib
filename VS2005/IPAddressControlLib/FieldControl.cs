@@ -83,44 +83,6 @@ namespace IPAddressControlLib
       }
    }
 
-   internal enum FocusEventType
-   {
-      GotFocus,
-      LostFocus
-   }
-
-   internal class FieldFocusEventArgs : EventArgs
-   {
-      //private int _fieldIndex;
-      private FocusEventType _focusEventType;
-
-      /*
-      public int FieldIndex
-      {
-         get
-         {
-            return _fieldIndex;
-         }
-         set
-         {
-            _fieldIndex = value;
-         }
-      }
-      */
-
-      public FocusEventType FocusEventType
-      {
-         get
-         {
-            return _focusEventType;
-         }
-         set
-         {
-            _focusEventType = value;
-         }
-      }
-   }
-
    internal class SpecialKeyEventArgs : EventArgs
    {
       private int _fieldIndex;
@@ -193,8 +155,6 @@ namespace IPAddressControlLib
       #region Public Events
 
       public event EventHandler<CedeFocusEventArgs> CedeFocusEvent;
-      public event EventHandler<FieldFocusEventArgs> FieldFocusEvent;
-      public event KeyPressEventHandler FieldKeyPressedEvent;
       public event EventHandler<SpecialKeyEventArgs> SpecialKeyEvent;
       public event EventHandler<TextChangedEventArgs> TextChangedEvent;
 
@@ -371,27 +331,9 @@ namespace IPAddressControlLib
 
       #region Protected Methods
 
-      protected override void OnGotFocus( EventArgs e )
-      {
-         base.OnGotFocus( e );
-         SendFieldFocusEvent( FocusEventType.GotFocus );
-      }
-
-      protected override void OnLostFocus( EventArgs e )
-      {
-         base.OnLostFocus( e );
-         SendFieldFocusEvent( FocusEventType.LostFocus );
-      }
-
       protected override void OnKeyDown( KeyEventArgs e )
       {
          base.OnKeyDown( e );
-
-         if ( FieldKeyPressedEvent != null )
-         {
-            KeyPressEventArgs args = new KeyPressEventArgs( Convert.ToChar( e.KeyCode, CultureInfo.InvariantCulture ) );
-            FieldKeyPressedEvent( this, args );
-         }
 
          if ( e.KeyCode == Keys.Home || 
               e.KeyCode == Keys.End )
@@ -421,11 +363,10 @@ namespace IPAddressControlLib
             {
                SendCedeFocusEvent( Direction.Reverse, Selection.All );
             }
-            else
-               if ( SelectionLength == 0 && SelectionStart == 0 )
-               {
-                  SendCedeFocusEvent( Direction.Reverse, Selection.None );
-               }
+            else if ( SelectionLength == 0 && SelectionStart == 0 )
+            {
+               SendCedeFocusEvent( Direction.Reverse, Selection.None );
+            }
          }
 
          if ( e.KeyCode == Keys.Back )
@@ -536,6 +477,17 @@ namespace IPAddressControlLib
          }
       }
 
+      protected override void WndProc( ref Message m )
+      {
+         switch ( m.Msg )
+         {
+            case 0x007b:  // WM_CONTEXTMENU
+               return;
+         }
+
+         base.WndProc( ref m );
+      }
+
       #endregion // Protected Methods
 
       #region Private Methods
@@ -601,17 +553,6 @@ namespace IPAddressControlLib
             args.Direction = direction;
             args.Selection = selection;
             CedeFocusEvent( this, args );
-         }
-      }
-
-      private void SendFieldFocusEvent( FocusEventType fet )
-      {
-         if ( null != FieldFocusEvent )
-         {
-            FieldFocusEventArgs args = new FieldFocusEventArgs();
-            //args.FieldIndex = FieldIndex;
-            args.FocusEventType = fet;
-            FieldFocusEvent( this, args );
          }
       }
 
