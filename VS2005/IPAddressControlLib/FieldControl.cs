@@ -369,12 +369,12 @@ namespace IPAddressControlLib
             }
          }
 
-         if ( e.KeyCode == Keys.Back )
+         if ( !ReadOnly && e.KeyCode == Keys.Back )
          {
             HandleBackKey( e );
          }
 
-         if ( e.KeyCode == Keys.Delete )
+         if ( !ReadOnly && e.KeyCode == Keys.Delete )
          {
             if ( SelectionStart < TextLength && TextLength > 0 )
             {
