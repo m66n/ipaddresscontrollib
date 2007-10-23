@@ -391,7 +391,7 @@ namespace IPAddressControlLib
 
       private void HandleBackspaceKey()
       {
-         if ( TextLength == 0 || ( SelectionStart == 0 && SelectionLength == 0 ) )
+         if ( !ReadOnly && ( TextLength == 0 || ( SelectionStart == 0 && SelectionLength == 0 ) ) )
          {
             SendCedeFocusEvent( Action.Trim );
             _invalidKeyDown = true;

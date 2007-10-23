@@ -441,7 +441,7 @@ namespace IPAddressControlLib
 
       private void HandleBackspaceKey( KeyEventArgs e )
       {
-         if ( TextLength == 0 || ( SelectionStart == 0 && SelectionLength == 0 ) )
+         if ( !ReadOnly && ( TextLength == 0 || ( SelectionStart == 0 && SelectionLength == 0 ) ) )
          {
             SendCedeFocusEvent( Action.Trim );
             e.SuppressKeyPress = true;
