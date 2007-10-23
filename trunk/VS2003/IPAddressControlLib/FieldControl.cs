@@ -33,7 +33,7 @@ namespace IPAddressControlLib
    internal enum Direction
    {
       Forward,
-      Backward
+      Reverse
    };
 
    internal enum Selection
@@ -42,14 +42,20 @@ namespace IPAddressControlLib
       All
    };
 
-   internal delegate bool CedeFocusHandler( int fieldIndex, Direction direction, Selection selection );
-   internal delegate void SpecialKeyHandler( int fieldIndex, Keys keyCode );
+   internal enum Action
+   {
+      None,
+      Trim,
+      Home,
+      End
+   }
+
+   internal delegate void CedeFocusHandler( int fieldIndex, Direction direction, Selection selection, Action action );
    internal delegate void TextChangedHandler( int fieldIndex, string newText );
 
 	internal class FieldControl : System.Windows.Forms.TextBox
 	{
       public event CedeFocusHandler CedeFocusEvent;
-      public event SpecialKeyHandler SpecialKeyEvent;
       public event TextChangedHandler TextChangedEvent;
 
       public const int MinimumValue = 0;
@@ -83,22 +89,13 @@ namespace IPAddressControlLib
 
       public int FieldIndex
       {
-         get 
-         {
-            return _fieldIndex;
-         }
-         set
-         {
-            _fieldIndex = value;
-         }
+         get { return _fieldIndex; }
+         set { _fieldIndex = value; }
       }
 
       public int RangeLower
       {
-         get
-         {
-            return _rangeLower;
-         }
+         get {  return _rangeLower; }
          set
          {
             if ( value < MinimumValue )
@@ -115,19 +112,16 @@ namespace IPAddressControlLib
                _rangeLower = value;
             }
 
-            if ( this.Value < _rangeLower )
+            if ( Value < _rangeLower )
             {
-               this.Text = _rangeLower.ToString( CultureInfo.InvariantCulture );
+               Text = _rangeLower.ToString( CultureInfo.InvariantCulture );
             }
          }
       }
 
       public int RangeUpper
       {
-         get
-         {
-            return _rangeUpper;
-         }
+         get { return _rangeUpper; }
          set
          {
             if ( value < _rangeLower )
@@ -144,9 +138,9 @@ namespace IPAddressControlLib
                _rangeUpper = value;
             }
 
-            if ( this.Value > _rangeUpper )
+            if ( Value > _rangeUpper )
             {
-               this.Text = _rangeUpper.ToString( CultureInfo.InvariantCulture );
+               Text = _rangeUpper.ToString( CultureInfo.InvariantCulture );
             }
          }
       }
@@ -155,45 +149,57 @@ namespace IPAddressControlLib
 
       #region Public Functions
 
-      public void HandleSpecialKey( Keys keyCode )
+      public void SetFont( Font font )
       {
-         switch ( keyCode )
+         Font = font;
+         Size = CalculateControlSize();
+      }
+
+      public void TakeFocus( Action action )
+      {
+         Focus();
+
+         switch ( action )
          {
-            case Keys.Back:
-               Focus();
-               if ( TextLength > 0  )
+            case Action.Trim:
+
+               if ( TextLength > 0 )
                {
                   int newLength = TextLength - 1;
                   Text = Text.Substring( 0, newLength );
                }
                SelectionStart = TextLength;
-               break;
-         }
-      }
+               return;
 
-      public void SetFont( Font font )
-      {
-         this.Font = font;
-         this.Size = CalculateControlSize();
+            case Action.Home:
+
+               SelectionStart = 0;
+               SelectionLength = 0;
+               return;
+
+            case Action.End:
+
+               SelectionStart = TextLength;
+               return;
+         }
       }
 
       public void TakeFocus( Direction direction, Selection selection )
       {
-         this.Focus();
+         Focus();
 
          if ( selection == Selection.All )
          {
-            this.SelectionStart = 0;
-            this.SelectionLength = this.TextLength;
+            SelectionStart = 0;
+            SelectionLength = TextLength;
+         }
+         else if ( direction == Direction.Forward )
+         {
+            SelectionStart = 0;
          }
          else
-         if ( direction == Direction.Forward )
          {
-            this.SelectionStart = 0;
-         }
-         else
-         {
-            this.SelectionStart = this.TextLength;
+            SelectionStart = TextLength;
          }
       }
 
@@ -208,13 +214,13 @@ namespace IPAddressControlLib
 
 		public FieldControl()
 		{
-         this.AutoSize         = false;
-         this.BorderStyle      = BorderStyle.None;
-         this.MaxLength        = 3;
-         this.TabStop          = false;
-         this.TextAlign        = HorizontalAlignment.Center;
+         AutoSize         = false;
+         BorderStyle      = BorderStyle.None;
+         MaxLength        = 3;
+         TabStop          = false;
+         TextAlign        = HorizontalAlignment.Center;
 
-         this.Size             = CalculateControlSize();
+         Size             = CalculateControlSize();
 		}
 
       #endregion
@@ -225,87 +231,58 @@ namespace IPAddressControlLib
       {
          base.OnKeyDown( e );
 
-         if ( e.KeyCode == Keys.Home || 
-              e.KeyCode == Keys.End )
-         {
-            SendSpecialKeyEvent( e.KeyCode );
-            return;
-         }
-
          _invalidKeyDown = false;
 
-         if ( e.KeyCode < Keys.NumPad0 || e.KeyCode > Keys.NumPad9 )
+         switch ( e.KeyCode )
          {
-            if ( e.KeyCode < Keys.D0 || e.KeyCode > Keys.D9 )
-            {
-               if ( !ValidKeyDown( e ) )
-               {
-                  _invalidKeyDown = true;
-               }
-            }
+            case Keys.Home:
+               SendCedeFocusEvent( Action.Home );
+               return;
+
+            case Keys.End:
+               SendCedeFocusEvent( Action.End );
+               return;
          }
 
-         if ( IsCedeFocusKey( e.KeyCode ) )
+         if ( IsCedeFocusKey( e ) )
          {
-            if ( CedeFocusEvent != null )
-            {
-               CedeFocusEvent( this.FieldIndex, Direction.Forward, Selection.All );
-            }
-         }
-
-         if ( e.KeyCode == Keys.Left || e.KeyCode == Keys.Up )
-         {
-            if ( e.Modifiers == Keys.Control )
-            {
-               if ( CedeFocusEvent != null )
-               {
-                  CedeFocusEvent( this.FieldIndex, Direction.Backward, Selection.All );
-               }
-            }
-            else
-            if ( SelectionLength == 0 && SelectionStart == 0 )
-            {
-               if ( CedeFocusEvent != null )
-               {
-                  CedeFocusEvent( this.FieldIndex, Direction.Backward, Selection.None );
-               }
-            }
-         }
-
-         if ( !ReadOnly && e.KeyCode == Keys.Back )
-         {
-            HandleBackKey( e );
+            SendCedeFocusEvent( Direction.Forward, Selection.All );
             _invalidKeyDown = true;
+            return;
          }
-
-         if ( !ReadOnly && e.KeyCode == Keys.Delete )
+         else if ( IsForwardKey( e ) )
          {
-            if ( SelectionStart < TextLength && TextLength > 0 )
+            if ( e.Control )
             {
-               int index = SelectionStart;
-               Text = Text.Remove( SelectionStart, ( SelectionLength > 0 ) ? SelectionLength : 1 );
-               SelectionStart = index;
-               e.Handled = true;
-               _invalidKeyDown = true;
+               SendCedeFocusEvent( Direction.Forward, Selection.All );
+               return;
+            }
+            else if ( SelectionLength == 0 && SelectionStart == TextLength )
+            {
+               SendCedeFocusEvent( Direction.Forward, Selection.None );
+               return;
             }
          }
-
-         if ( e.KeyCode == Keys.Right || e.KeyCode == Keys.Down )
+         else if ( IsReverseKey( e ) )
          {
-            if ( e.Modifiers == Keys.Control )
+            if ( e.Control )
             {
-               if ( CedeFocusEvent != null )
-               {
-                  CedeFocusEvent( this.FieldIndex, Direction.Forward, Selection.All );
-               }
+               SendCedeFocusEvent( Direction.Reverse, Selection.All );
+               return;
             }
-            else if ( SelectionLength == 0 && SelectionStart == Text.Length )
+            else if ( SelectionLength == 0 && SelectionStart == 0 )
             {
-               if ( CedeFocusEvent != null )
-               {
-                  CedeFocusEvent( this.FieldIndex, Direction.Forward, Selection.None );
-               }
+               SendCedeFocusEvent( Direction.Reverse, Selection.None );
+               return;
             }
+         }
+         else if ( IsBackspaceKey( e ) )
+         {
+            HandleBackspaceKey();
+         }
+         else if ( !IsNumericKey( e ) && !IsEditKey( e ) )
+         {
+            _invalidKeyDown = true;
          }
       }
 
@@ -321,60 +298,70 @@ namespace IPAddressControlLib
 
       protected override void OnTextChanged( EventArgs e )
       {
-         if ( !this.Blank )
+         base.OnTextChanged( e );
+
+         if ( !Blank )
          {
             try
             {
-               int val = Int32.Parse( this.Text, CultureInfo.InvariantCulture );
+               int value = Int32.Parse( Text, CultureInfo.InvariantCulture );
 
-               if ( val > this.RangeUpper )
+               if ( value > RangeUpper )
                {
-                  this.Text = this.RangeUpper.ToString( CultureInfo.InvariantCulture );
+                  base.Text = RangeUpper.ToString( CultureInfo.InvariantCulture );
+                  SelectionStart = 0;
+               }
+               else if ( ( TextLength == MaxLength ) && ( value < RangeLower ) )
+               {
+                  base.Text = RangeLower.ToString( CultureInfo.InvariantCulture );
+                  SelectionStart = 0;
                }
                else
                {
-                  this.Text = val.ToString( CultureInfo.InvariantCulture );
+                  int originalLength = TextLength;
+                  int newSelectionStart = SelectionStart;
+
+                  base.Text = value.ToString( CultureInfo.InvariantCulture );
+
+                  if ( TextLength < originalLength )
+                  {
+                     newSelectionStart -= ( originalLength - TextLength );
+                     SelectionStart = Math.Max( 0, newSelectionStart );
+                  }
                }
             }
             catch ( ArgumentNullException )
             {
-               this.Text = String.Empty;
+               Text = String.Empty;
             }
             catch ( FormatException )
             {
-               this.Text = String.Empty;
+               Text = String.Empty;
             }
             catch ( OverflowException )
             {
-               this.Text = String.Empty;
+               Text = String.Empty;
             }
          }
 
-         this.SelectionStart = this.TextLength;
-
-         if ( this.TextChangedEvent != null )
+         if ( TextChangedEvent != null )
          {
-            this.TextChangedEvent( this.FieldIndex, this.Text );
+            TextChangedEvent( FieldIndex, Text );
          }
 
-         if ( this.Text.Length == this.MaxLength && this.Focused )
+         if ( TextLength == MaxLength && Focused && SelectionStart == TextLength )
          {
-            if ( CedeFocusEvent != null )
-            {
-               CedeFocusEvent( this.FieldIndex, Direction.Forward, Selection.All );
-            }
+            SendCedeFocusEvent( Direction.Forward, Selection.All );
          }
-
-         base.OnTextChanged( e );
       }
 
       protected override void OnValidating( CancelEventArgs e )
       {
-         if ( !this.Blank )
+         if ( !Blank )
          {
-            if ( this.Value < RangeLower )
+            if ( Value < RangeLower )
             {
-               this.Text = RangeLower.ToString( CultureInfo.InvariantCulture );
+               Text = RangeLower.ToString( CultureInfo.InvariantCulture );
             }
          }
 
@@ -392,7 +379,6 @@ namespace IPAddressControlLib
          base.WndProc( ref m );
       }
 
-
       #endregion
 
       #region Private Functions
@@ -400,37 +386,33 @@ namespace IPAddressControlLib
       private Size CalculateControlSize()
       {
          string text = new string( '0', MaxLength );
-         return Utility.CalculateStringSize( this.Handle, this.Font, text );
+         return Utility.CalculateStringSize( Handle, Font, text );
       }
 
-      private void HandleBackKey( KeyEventArgs e )
+      private void HandleBackspaceKey()
       {
          if ( TextLength == 0 || ( SelectionStart == 0 && SelectionLength == 0 ) )
          {
-            SendSpecialKeyEvent( Keys.Back );
-            e.Handled = true;
-         }
-         else if ( SelectionLength > 0 )
-         {
-            int index = SelectionStart;
-            Text = Text.Remove( SelectionStart, SelectionLength );
-            SelectionStart = index;
-            e.Handled = true;
-         }
-         else if ( SelectionStart > 0 )
-         {
-            int index = --SelectionStart;
-            Text = Text.Remove( SelectionStart, 1 );
-            SelectionStart = index;
-            e.Handled = true;
+            SendCedeFocusEvent( Action.Trim );
+            _invalidKeyDown = true;
          }
       }
 
-      private bool IsCedeFocusKey( Keys keyCode )
+      private static bool IsBackspaceKey( KeyEventArgs e )
       {
-         if ( keyCode == Keys.OemPeriod ||
-              keyCode == Keys.Decimal ||
-              keyCode == Keys.Space )
+         if ( e.KeyCode == Keys.Back )
+         {
+            return true;
+         }
+
+         return false;
+      }
+
+      private bool IsCedeFocusKey( KeyEventArgs e )
+      {
+         if ( e.KeyCode == Keys.OemPeriod ||
+              e.KeyCode == Keys.Decimal ||
+              e.KeyCode == Keys.Space )
 
          {
             if ( TextLength != 0 && SelectionLength == 0 && SelectionStart != 0 )
@@ -442,30 +424,73 @@ namespace IPAddressControlLib
          return false;
       }
 
-      private void SendSpecialKeyEvent( Keys keyCode )
+      private static bool IsEditKey( KeyEventArgs e )
       {
-         if ( null != SpecialKeyEvent )
-         {
-            SpecialKeyEvent( FieldIndex, keyCode );
-         }
-      }
-
-      private static bool ValidKeyDown( KeyEventArgs e )
-      {
-         if ( e.KeyCode == Keys.Back || 
+         if ( e.KeyCode == Keys.Back ||
               e.KeyCode == Keys.Delete )
          {
             return true;
          }
          else if ( e.Modifiers == Keys.Control &&
-                 ( e.KeyCode == Keys.C ||
-                   e.KeyCode == Keys.V ||
-                   e.KeyCode == Keys.X ) )
+                   ( e.KeyCode == Keys.C ||
+                     e.KeyCode == Keys.V ||
+                     e.KeyCode == Keys.X ) )
          {
             return true;
          }
 
          return false;
+      }
+
+      private static bool IsForwardKey( KeyEventArgs e )
+      {
+         if ( e.KeyCode == Keys.Right ||
+              e.KeyCode == Keys.Down )
+         {
+            return true;
+         }
+
+         return false;
+      }
+
+      private static bool IsNumericKey( KeyEventArgs e )
+      {
+         if ( e.KeyCode < Keys.NumPad0 || e.KeyCode > Keys.NumPad9 )
+         {
+            if ( e.KeyCode < Keys.D0 || e.KeyCode > Keys.D9 )
+            {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
+      private static bool IsReverseKey( KeyEventArgs e )
+      {
+         if ( e.KeyCode == Keys.Left ||
+              e.KeyCode == Keys.Up )
+         {
+            return true;
+         }
+
+         return false;
+      }
+
+      private void SendCedeFocusEvent( Action action )
+      {
+         if ( CedeFocusEvent != null )
+         {
+            CedeFocusEvent( FieldIndex, Direction.Forward, Selection.None, action );
+         }
+      }
+
+      private void SendCedeFocusEvent( Direction direction, Selection selection )
+      {
+         if ( CedeFocusEvent != null )
+         {
+            CedeFocusEvent( FieldIndex, direction, selection, Action.None );
+         }
       }
 
       #endregion
@@ -478,7 +503,7 @@ namespace IPAddressControlLib
          {
             try
             {
-               return Int32.Parse( this.Text, CultureInfo.InvariantCulture );
+               return Int32.Parse( Text, CultureInfo.InvariantCulture );
             }
             catch ( ArgumentNullException )
             {

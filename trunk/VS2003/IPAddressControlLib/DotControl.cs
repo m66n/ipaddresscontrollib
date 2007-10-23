@@ -63,24 +63,25 @@ namespace IPAddressControlLib
 
       public void SetFont( Font font )
       {
-         this.Font = font;
-         this.Size = CalculateControlSize();
+         Font = font;
+         Size = CalculateControlSize();
       }
 
       public override string ToString()
       {
-         return this.Text;
+         return Text;
       }
 
 		public DotControl()
 		{
-         this.Font    = Control.DefaultFont;
-         this.TabStop = false;
+         BackColor = Color.FromKnownColor( KnownColor.Window  );
+         Font    = Control.DefaultFont;
+         TabStop = false;
 
          ResourceManager rm = new ResourceManager( "IPAddressControlLib.Strings", Assembly.GetExecutingAssembly() );
-         this.Text = rm.GetString( "FieldSeparator" );
+         Text = rm.GetString( "FieldSeparator" );
 
-         this.Size = CalculateControlSize();
+         Size = CalculateControlSize();
 
          SetStyle( ControlStyles.AllPaintingInWmPaint, true );
          SetStyle( ControlStyles.DoubleBuffer, true );
@@ -90,13 +91,13 @@ namespace IPAddressControlLib
 
       protected override void OnFontChanged(EventArgs e)
       {
-         this.Size = CalculateControlSize();
+         Size = CalculateControlSize();
          Invalidate();
       }
 
       private Size CalculateControlSize()
       {
-         return Utility.CalculateStringSize( this.Handle, this.Font, this.Text );
+         return Utility.CalculateStringSize( Handle, Font, Text );
       }
 
       protected void OnPaintStandard( PaintEventArgs e )
@@ -104,41 +105,41 @@ namespace IPAddressControlLib
          SolidBrush ctrlBrush = null;
          SolidBrush textBrush = null;
 
-         if ( this.Enabled )
+         if ( Enabled )
          {
-            if ( this.ReadOnly )
+            if ( ReadOnly )
             {
-               if ( this.BackColor.ToKnownColor() == KnownColor.Window )
+               if ( BackColor.ToKnownColor() == KnownColor.Window )
                {
                   ctrlBrush = new SolidBrush( Color.FromKnownColor( KnownColor.Control ) );
                   textBrush = new SolidBrush( Color.FromKnownColor( KnownColor.WindowText ) );
                }
                else
                {
-                  ctrlBrush = new SolidBrush( this.BackColor );
-                  textBrush = new SolidBrush( this.ForeColor );
+                  ctrlBrush = new SolidBrush( BackColor );
+                  textBrush = new SolidBrush( ForeColor );
                }
             }
             else
             {
-               ctrlBrush = new SolidBrush( this.BackColor );
-               textBrush = new SolidBrush( this.ForeColor );
+               ctrlBrush = new SolidBrush( BackColor );
+               textBrush = new SolidBrush( ForeColor );
             }
          }
          else
          {
-            if ( this.BackColor.ToKnownColor() == KnownColor.Window )
+            if ( BackColor.ToKnownColor() == KnownColor.Window )
             {
                ctrlBrush = new SolidBrush( Color.FromKnownColor( KnownColor.Control ) );
             }
             else
             {
-               ctrlBrush = new SolidBrush( this.BackColor );
+               ctrlBrush = new SolidBrush( BackColor );
             }
 
-            if ( this.ForeColor.ToKnownColor() == KnownColor.Control )
+            if ( ForeColor.ToKnownColor() == KnownColor.Control )
             {
-               textBrush = new SolidBrush( this.ForeColor );
+               textBrush = new SolidBrush( ForeColor );
             }
             else
             {
@@ -156,7 +157,7 @@ namespace IPAddressControlLib
 
          using ( textBrush )
          {
-            e.Graphics.DrawString( this.Text, this.Font, textBrush, this.ClientRectangle, stringFormat );
+            e.Graphics.DrawString( Text, Font, textBrush, ClientRectangle, stringFormat );
          }
       }
 
@@ -172,13 +173,13 @@ namespace IPAddressControlLib
          IntPtr hdc = new IntPtr();
          hdc = e.Graphics.GetHdc();
 
-         if ( this.BackColor.ToKnownColor() != KnownColor.Window )
+         if ( BackColor.ToKnownColor() != KnownColor.Window )
          {
             e.Graphics.ReleaseHdc( hdc );
 
             using ( SolidBrush backgroundBrush = new SolidBrush( BackColor ) )
             {
-               e.Graphics.FillRectangle( backgroundBrush, this.ClientRectangle );
+               e.Graphics.FillRectangle( backgroundBrush, ClientRectangle );
             }
 
             hdc = e.Graphics.GetHdc();
@@ -186,7 +187,7 @@ namespace IPAddressControlLib
          else
          if ( Enabled & !ReadOnly )
          {
-            IntPtr hTheme = NativeMethods.OpenThemeData( this.Handle, "Edit" );
+            IntPtr hTheme = NativeMethods.OpenThemeData( Handle, "Edit" );
 
             NativeMethods.DTBGOPTS options = new NativeMethods.DTBGOPTS();
             options.dwSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(options);
@@ -202,7 +203,7 @@ namespace IPAddressControlLib
          }
          else
          {
-            IntPtr hTheme = NativeMethods.OpenThemeData( this.Handle, "Globals" );
+            IntPtr hTheme = NativeMethods.OpenThemeData( Handle, "Globals" );
 
             IntPtr hBrush = NativeMethods.GetThemeSysColorBrush( hTheme, 15 );
 
@@ -227,13 +228,13 @@ namespace IPAddressControlLib
 
          if ( Enabled )
          {
-            if ( this.ForeColor.ToKnownColor() != KnownColor.WindowText )
+            if ( ForeColor.ToKnownColor() != KnownColor.WindowText )
             {
-               colorref = NativeMethods.RGB( this.ForeColor.R, this.ForeColor.G, this.ForeColor.B );
+               colorref = NativeMethods.RGB( ForeColor.R, ForeColor.G, ForeColor.B );
             }
             else
             {
-               IntPtr hTheme = NativeMethods.OpenThemeData( this.Handle, "Globals" );
+               IntPtr hTheme = NativeMethods.OpenThemeData( Handle, "Globals" );
                colorref = NativeMethods.GetThemeSysColor( hTheme, 6 );
                if ( IntPtr.Zero != hTheme )
                {
@@ -244,7 +245,7 @@ namespace IPAddressControlLib
          }
          else
          {
-            IntPtr hTheme = NativeMethods.OpenThemeData( this.Handle, "Globals" );
+            IntPtr hTheme = NativeMethods.OpenThemeData( Handle, "Globals" );
             colorref = NativeMethods.GetThemeSysColor( hTheme, 16 );
             if ( IntPtr.Zero != hTheme )
             {
@@ -262,7 +263,7 @@ namespace IPAddressControlLib
 
          using ( SolidBrush textBrush = new SolidBrush( Color.FromArgb( r, g, b ) ) )
          {
-            e.Graphics.DrawString( this.Text, this.Font, textBrush, this.ClientRectangle, stringFormat );
+            e.Graphics.DrawString( Text, Font, textBrush, ClientRectangle, stringFormat );
          }
       }
 
