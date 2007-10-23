@@ -39,26 +39,14 @@ namespace IPAddressControlLib
 
       public int FieldIndex
       {
-         get
-         {
-            return _fieldIndex;
-         }
-         set
-         {
-            _fieldIndex = value;
-         }
+         get { return _fieldIndex; }
+         set { _fieldIndex = value; }
       }
 
       public String Text
       {
-         get
-         {
-            return _text;
-         }
-         set
-         {
-            _text = value;
-         }
+         get { return _text; }
+         set { _text = value; }
       }
    }
 
@@ -120,10 +108,7 @@ namespace IPAddressControlLib
       [Browsable( true )]
       public bool AutoHeight
       {
-         get
-         {
-            return _autoHeight;
-         }
+         get { return _autoHeight; }
          set
          {
             _autoHeight= value;
@@ -178,10 +163,7 @@ namespace IPAddressControlLib
       [Browsable( true )]
       public new BorderStyle BorderStyle
       {
-         get
-         {
-            return _borderStyle;
-         }
+         get { return _borderStyle; }
          set
          {
             _borderStyle = value;
@@ -210,19 +192,13 @@ namespace IPAddressControlLib
       [Browsable( true )]
       public override Size MinimumSize
       {
-         get
-         {
-            return CalculateMinimumSize();
-         }
+         get { return CalculateMinimumSize(); }
       }
 
       [Browsable( true )]
       public bool ReadOnly
       {
-         get
-         {
-            return _readOnly;
-         }
+         get { return _readOnly; }
          set
          {
             _readOnly = value;
@@ -375,7 +351,6 @@ namespace IPAddressControlLib
             _fieldControls[index].MouseHover += new EventHandler( OnSubControlMouseHovered );
             _fieldControls[index].MouseLeave += new EventHandler( OnSubControlMouseLeft );
             _fieldControls[index].MouseMove += new MouseEventHandler( OnSubControlMouseMoved );
-            _fieldControls[index].SpecialKeyEvent += new EventHandler<SpecialKeyEventArgs>( OnSpecialKey );
             _fieldControls[index].TextChangedEvent += new EventHandler<TextChangedEventArgs>( OnFieldTextChanged );
 
             Controls.Add( _fieldControls[index] );
@@ -538,14 +513,14 @@ namespace IPAddressControlLib
       {
          Size newSize = MinimumSize;
 
-         if ( Size.Width > newSize.Width )
+         if ( Width > newSize.Width )
          {
-            newSize.Width = Size.Width;
+            newSize.Width = Width;
          }
 
-         if ( Size.Height > newSize.Height )
+         if ( Height > newSize.Height )
          {
-            newSize.Height = Size.Height;
+            newSize.Height = Height;
          }
 
          if ( AutoHeight )
@@ -566,14 +541,14 @@ namespace IPAddressControlLib
 
          foreach ( FieldControl fc in _fieldControls )
          {
-            minimumSize.Width += fc.Size.Width;
-            minimumSize.Height = Math.Max( minimumSize.Height, fc.Size.Height );
+            minimumSize.Width += fc.Width;
+            minimumSize.Height = Math.Max( minimumSize.Height, fc.Height );
          }
 
          foreach ( DotControl dc in _dotControls )
          {
-            minimumSize.Width += dc.Size.Width;
-            minimumSize.Height = Math.Max( minimumSize.Height, dc.Size.Height );
+            minimumSize.Width += dc.Width;
+            minimumSize.Height = Math.Max( minimumSize.Height, dc.Height );
          }
 
          switch ( BorderStyle )
@@ -685,13 +660,13 @@ namespace IPAddressControlLib
          {
             _fieldControls[i].Location = new Point( x, y );
 
-            x += _fieldControls[i].Size.Width;
+            x += _fieldControls[i].Width;
 
             if ( i < _dotControls.Length )
             {
                x += offsets[offsetIndex++];
                _dotControls[i].Location = new Point( x, y );
-               x += _dotControls[i].Size.Width;
+               x += _dotControls[i].Width;
                x += offsets[offsetIndex++];
             }
          }
@@ -701,6 +676,29 @@ namespace IPAddressControlLib
 
       private void OnCedeFocus( Object sender, CedeFocusEventArgs e )
       {
+         switch ( e.Action )
+         {
+            case Action.Home:
+
+               _fieldControls[0].TakeFocus( Action.Home );
+               return;
+
+            case Action.End:
+
+               _fieldControls[FieldCount - 1].TakeFocus( Action.End );
+               return;
+
+            case Action.Trim:
+
+               if ( e.FieldIndex == 0 )
+               {
+                  return;
+               }
+
+               _fieldControls[e.FieldIndex - 1].TakeFocus( Action.Trim );
+               return;
+         }
+
          if ( ( e.Direction == Direction.Reverse && e.FieldIndex == 0 ) ||
               ( e.Direction == Direction.Forward && e.FieldIndex == ( FieldCount - 1 ) ) )
          {
@@ -755,30 +753,6 @@ namespace IPAddressControlLib
          }
 
          OnTextChanged( EventArgs.Empty );
-      }
-
-      private void OnSpecialKey( Object sender, SpecialKeyEventArgs e )
-      {
-         switch ( e.KeyCode )
-         {
-            case Keys.Back:
-
-               if ( e.FieldIndex > 0 )
-               {
-                  _fieldControls[e.FieldIndex-1].HandleSpecialKey( Keys.Back );
-               }
-               break;
-
-            case Keys.Home:
-
-               _fieldControls[0].TakeFocus( Direction.Forward, Selection.None );
-               break;
-
-            case Keys.End:
-
-               _fieldControls[FieldCount - 1].TakeFocus( Direction.Reverse, Selection.None );
-               break;
-         }
       }
 
       private void OnSubControlClicked( object sender, EventArgs e )

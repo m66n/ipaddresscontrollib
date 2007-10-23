@@ -351,6 +351,8 @@ namespace IPAddressControlLib
 
 		public IPAddressControl()
 		{
+         BackColor = Color.FromKnownColor( KnownColor.Window );
+
 			for ( int index = 0; index < _fieldControls.Length; ++index )
          {
             _fieldControls[index] = new FieldControl();
@@ -371,10 +373,9 @@ namespace IPAddressControlLib
             _fieldControls[index].MouseHover += new EventHandler( OnSubControlMouseHovered );
             _fieldControls[index].MouseLeave += new EventHandler( OnSubControlMouseLeft );
             _fieldControls[index].MouseMove += new MouseEventHandler( OnSubControlMouseMoved );
-            _fieldControls[index].SpecialKeyEvent += new SpecialKeyHandler( OnSpecialKey );
             _fieldControls[index].TextChangedEvent += new TextChangedHandler( OnFieldTextChanged );
 
-            this.Controls.Add( _fieldControls[index] );
+            Controls.Add( _fieldControls[index] );
          }
          
          for ( int index = 0; index < _dotControls.Length; ++index )
@@ -385,7 +386,7 @@ namespace IPAddressControlLib
 
             _dotControls[index].Name = "dotControl" + index.ToString( CultureInfo.InvariantCulture );
             _dotControls[index].Parent = this;
-            _dotControls[index].IgnoreTheme = ( this.BorderStyle != BorderStyle.Fixed3D );
+            _dotControls[index].IgnoreTheme = ( BorderStyle != BorderStyle.Fixed3D );
 
             _dotControls[index].Click += new EventHandler( OnSubControlClicked );
             _dotControls[index].DoubleClick += new EventHandler( OnSubControlDoubleClicked );
@@ -394,7 +395,7 @@ namespace IPAddressControlLib
             _dotControls[index].MouseLeave += new EventHandler( OnSubControlMouseLeft );
             _dotControls[index].MouseMove += new MouseEventHandler( OnSubControlMouseMoved );
 
-            this.Controls.Add( _dotControls[index] );
+            Controls.Add( _dotControls[index] );
          }
 
          Cursor = Cursors.IBeam;
@@ -419,7 +420,7 @@ namespace IPAddressControlLib
          {
             if ( fc != null )
             {
-               fc.BackColor = this.BackColor;
+               fc.BackColor = BackColor;
             }
          }
 
@@ -427,7 +428,7 @@ namespace IPAddressControlLib
          {
             if ( dc != null )
             {
-               dc.BackColor = this.BackColor;
+               dc.BackColor = BackColor;
                dc.Invalidate();
             }
          }
@@ -441,12 +442,12 @@ namespace IPAddressControlLib
       {
          foreach ( FieldControl fc in _fieldControls )
          {
-            fc.SetFont( this.Font );
+            fc.SetFont( Font );
          }
 
          foreach ( DotControl dc in _dotControls )
          {
-            dc.SetFont( this.Font );
+            dc.SetFont( Font );
          }
 
          AdjustSize();
@@ -461,12 +462,12 @@ namespace IPAddressControlLib
       {
          foreach ( FieldControl fc in _fieldControls )
          {
-            fc.ForeColor = this.ForeColor;
+            fc.ForeColor = ForeColor;
          }
 
          foreach ( DotControl dc in _dotControls )
          {
-            dc.ForeColor = this.ForeColor;
+            dc.ForeColor = ForeColor;
          }
 
          base.OnForeColorChanged( e );
@@ -585,14 +586,14 @@ namespace IPAddressControlLib
 
             foreach ( FieldControl fc in _fieldControls )
             {
-               retVal.Width += fc.Size.Width;
-               retVal.Height = Math.Max( retVal.Height, fc.Size.Height );
+               retVal.Width += fc.Width;
+               retVal.Height = Math.Max( retVal.Height, fc.Height );
             }
 
             foreach ( DotControl dc in _dotControls )
             {
-               retVal.Width += dc.Size.Width;
-               retVal.Height = Math.Max( retVal.Height, dc.Size.Height );
+               retVal.Width += dc.Width;
+               retVal.Height = Math.Max( retVal.Height, dc.Height );
             }
 
             switch ( BorderStyle )
@@ -619,40 +620,23 @@ namespace IPAddressControlLib
       {
          Size newSize = MinimumSize;
 
-         if ( this.Size.Width > newSize.Width )
+         if ( Width > newSize.Width )
          {
-            newSize = new Size( this.Size.Width, newSize.Height );
+            newSize = new Size( Width, newSize.Height );
          }
 
-         if ( this.Size.Height > newSize.Height )
+         if ( Height > newSize.Height )
          {
-            newSize = new Size( newSize.Width, this.Size.Height );
+            newSize = new Size( Height, newSize.Width );
          }
 
          if ( AutoHeight )
          {
-            this.Size = new Size( newSize.Width, MinimumSize.Height );
+            Size = new Size( newSize.Width, MinimumSize.Height );
          }
          else
          {
-            this.Size = newSize;
-         }
-      }
-
-      private void IPAddressControl_DragDrop( object sender, System.Windows.Forms.DragEventArgs e )
-      {
-         Text = e.Data.GetData( DataFormats.Text ).ToString();
-      }
-
-      private void IPAddressControl_DragEnter( object sender, System.Windows.Forms.DragEventArgs e )
-      {
-         if ( e.Data.GetDataPresent( DataFormats.Text ) )
-         {
-            e.Effect = DragDropEffects.Copy;
-         }
-         else
-         {
-            e.Effect = DragDropEffects.None;
+            Size = newSize;
          }
       }
 
@@ -660,7 +644,7 @@ namespace IPAddressControlLib
       {
          SuspendLayout();
 
-         int difference = this.Size.Width - MinimumSize.Width;
+         int difference = Width - MinimumSize.Width;
 
          Debug.Assert( difference >= 0 );
 
@@ -684,7 +668,7 @@ namespace IPAddressControlLib
          int x = 0;
          int y = 0;
 
-         switch ( this.BorderStyle )
+         switch ( BorderStyle )
          {
             case BorderStyle.Fixed3D:
                x = 3;
@@ -704,13 +688,13 @@ namespace IPAddressControlLib
          {
             _fieldControls[i].Location = new Point( x, y );
 
-            x += _fieldControls[i].Size.Width;      
+            x += _fieldControls[i].Width;      
 
             if ( i < _dotControls.Length )
             {
                x += offsets[offsetIndex++];
                _dotControls[i].Location = new Point( x, y );
-               x += _dotControls[i].Size.Width;
+               x += _dotControls[i].Width;
                x += offsets[offsetIndex++];
             }
          }
@@ -718,12 +702,31 @@ namespace IPAddressControlLib
          ResumeLayout( false );
       }
 
-      private bool OnCedeFocus( int fieldIndex, Direction direction, Selection selection )
+      private void OnCedeFocus( int fieldIndex, Direction direction, Selection selection, Action action )
       {
-         if ( ( direction == Direction.Backward && fieldIndex == 0 ) ||
+         switch ( action )
+         {
+            case Action.Home:
+               _fieldControls[0].TakeFocus( Action.Home );
+               return;
+
+            case Action.End:
+               _fieldControls[FieldCount-1].TakeFocus( Action.End );
+               return;
+
+            case Action.Trim:
+               if ( fieldIndex == 0 )
+               {
+                  return;
+               }
+               _fieldControls[fieldIndex-1].TakeFocus( Action.Trim );
+               return;
+         }
+
+         if ( ( direction == Direction.Reverse && fieldIndex == 0 ) ||
               ( direction == Direction.Forward && fieldIndex == ( FieldCount - 1 ) ) )
          {
-            return false;
+            return;
          }
 
          if ( direction == Direction.Forward )
@@ -736,8 +739,6 @@ namespace IPAddressControlLib
          }
 
          _fieldControls[fieldIndex].TakeFocus( direction, selection );
-
-         return true;
       }
 
       private void OnFieldGotFocus( object sender, EventArgs e )
@@ -782,25 +783,25 @@ namespace IPAddressControlLib
 
          if ( Enabled )
          {
-            if ( this.ReadOnly )
+            if ( ReadOnly )
             {
-               if ( this.BackColor.ToKnownColor() == KnownColor.Window )
+               if ( BackColor.ToKnownColor() == KnownColor.Window )
                {
                   ctrlBrush = new SolidBrush( Color.FromKnownColor( KnownColor.Control ) );
                }
                else
                {
-                  ctrlBrush = new SolidBrush( this.BackColor );
+                  ctrlBrush = new SolidBrush( BackColor );
                }
             }
             else
             {
-               ctrlBrush = new SolidBrush( this.BackColor );
+               ctrlBrush = new SolidBrush( BackColor );
             }
          }
          else
          {
-            if ( this.BackColor.ToKnownColor() == KnownColor.Window )
+            if ( BackColor.ToKnownColor() == KnownColor.Window )
             {
                ctrlBrush = new SolidBrush( Color.FromKnownColor( KnownColor.Control ) );
             }
@@ -839,7 +840,7 @@ namespace IPAddressControlLib
          IntPtr hdc = new IntPtr();
          hdc = e.Graphics.GetHdc();
 
-         if ( this.BackColor.ToKnownColor() != KnownColor.Window )
+         if ( BackColor.ToKnownColor() != KnownColor.Window )
          {
             e.Graphics.ReleaseHdc( hdc );
 
@@ -850,7 +851,7 @@ namespace IPAddressControlLib
 
             hdc = e.Graphics.GetHdc();
 
-            IntPtr hTheme = NativeMethods.OpenThemeData( this.Handle, "Edit" );
+            IntPtr hTheme = NativeMethods.OpenThemeData( Handle, "Edit" );
 
             NativeMethods.DTBGOPTS options = new NativeMethods.DTBGOPTS();
             options.dwSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(options);
@@ -876,10 +877,9 @@ namespace IPAddressControlLib
                NativeMethods.CloseThemeData( hTheme );
             }
          }
-         else
-            if ( Enabled & !ReadOnly )
+         else if ( Enabled & !ReadOnly )
          {
-            IntPtr hTheme = NativeMethods.OpenThemeData( this.Handle, "Edit" );
+            IntPtr hTheme = NativeMethods.OpenThemeData( Handle, "Edit" );
 
             NativeMethods.DrawThemeBackground( hTheme, hdc, NativeMethods.EP_EDITTEXT,
                NativeMethods.ETS_NORMAL, ref rect, IntPtr.Zero );
@@ -891,7 +891,7 @@ namespace IPAddressControlLib
          }
          else
          {
-            IntPtr hTheme = NativeMethods.OpenThemeData( this.Handle, "Globals" );
+            IntPtr hTheme = NativeMethods.OpenThemeData( Handle, "Globals" );
 
             IntPtr hBrush = NativeMethods.GetThemeSysColorBrush( hTheme, 15 );
 
@@ -909,7 +909,7 @@ namespace IPAddressControlLib
                hTheme = IntPtr.Zero;
             }
 
-            hTheme = NativeMethods.OpenThemeData( this.Handle, "Edit" );
+            hTheme = NativeMethods.OpenThemeData( Handle, "Edit" );
 
             NativeMethods.DTBGOPTS options = new NativeMethods.DTBGOPTS();
             options.dwSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(options);
@@ -986,30 +986,6 @@ namespace IPAddressControlLib
       private void OnSubControlMouseMoved( object sender, MouseEventArgs e )
       {
          OnMouseMove( e );
-      }
-
-      private void OnSpecialKey( int fieldIndex, Keys keyCode )
-      {
-         switch ( keyCode )
-         {
-            case Keys.Back:
-
-               if ( fieldIndex > 0 )
-               {
-                  _fieldControls[fieldIndex-1].HandleSpecialKey( Keys.Back );
-               }
-               break;
-
-            case Keys.Home:
-
-               _fieldControls[0].TakeFocus( Direction.Forward, Selection.None );
-               break;
-
-            case Keys.End:
-
-               _fieldControls[FieldCount - 1].TakeFocus( Direction.Backward, Selection.None );
-               break;
-         }
       }
 
       #endregion
