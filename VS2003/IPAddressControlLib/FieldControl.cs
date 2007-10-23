@@ -193,13 +193,9 @@ namespace IPAddressControlLib
             SelectionStart = 0;
             SelectionLength = TextLength;
          }
-         else if ( direction == Direction.Forward )
-         {
-            SelectionStart = 0;
-         }
          else
          {
-            SelectionStart = TextLength;
+            SelectionStart = ( direction == Direction.Forward ) ? 0 : TextLength;
          }
       }
 
