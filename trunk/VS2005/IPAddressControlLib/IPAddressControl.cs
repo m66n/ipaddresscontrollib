@@ -268,6 +268,7 @@ namespace IPAddressControlLib
          return bytes;
       }
 
+      [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Naming", "CA1720", Justification = "Prefer to use bytes as a variable name." )]
       public void SetAddressBytes( byte[] bytes )
       {
          Clear();
@@ -573,6 +574,7 @@ namespace IPAddressControlLib
          return _referenceTextBox.Height;
       }
 
+      [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Usage", "CA1806", Justification = "What should be done if ReleaseDC() doesn't work?" )]
       private static NativeMethods.TEXTMETRIC GetTextMetrics( IntPtr hwnd, Font font )
       {
          IntPtr hdc = NativeMethods.GetWindowDC( hwnd );
@@ -582,9 +584,9 @@ namespace IPAddressControlLib
 
          try
          {
-            IntPtr hFontPreviouse = NativeMethods.SelectObject( hdc, hFont );
+            IntPtr hFontPrevious = NativeMethods.SelectObject( hdc, hFont );
             NativeMethods.GetTextMetrics( hdc, out textMetric );
-            NativeMethods.SelectObject( hdc, hFontPreviouse );
+            NativeMethods.SelectObject( hdc, hFontPrevious );
          }
          finally
          {
@@ -810,7 +812,7 @@ namespace IPAddressControlLib
 
          for ( index = 0; index < _dotControls.Length; ++index )
          {
-            int findIndex = text.IndexOf( _dotControls[index].Text, textIndex );
+            int findIndex = text.IndexOf( _dotControls[index].Text, textIndex, StringComparison.Ordinal );
 
             if ( findIndex >= 0 )
             {
