@@ -32,26 +32,8 @@ using System.Windows.Forms.VisualStyles;
 
 namespace IPAddressControlLib
 {
-   public class FieldChangedEventArgs : EventArgs
-   {
-      private int _fieldIndex;
-      private String _text;
-
-      public int FieldIndex
-      {
-         get { return _fieldIndex; }
-         set { _fieldIndex = value; }
-      }
-
-      public String Text
-      {
-         get { return _text; }
-         set { _text = value; }
-      }
-   }
-
    [DesignerAttribute( typeof( IPAddressControlDesigner ) )]
-   public class IPAddressControl : UserControl
+   public class IPAddressControl : Control
    {
       #region Public Constants
 
@@ -161,7 +143,7 @@ namespace IPAddressControlLib
       }
 
       [Browsable( true )]
-      public new BorderStyle BorderStyle
+      public BorderStyle BorderStyle
       {
          get { return _borderStyle; }
          set

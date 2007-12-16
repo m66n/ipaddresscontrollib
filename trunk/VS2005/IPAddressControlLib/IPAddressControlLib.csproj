@@ -42,11 +42,12 @@
     <Compile Include="DotControl.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="FieldChangedEventArgs.cs" />
     <Compile Include="FieldControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="IPAddressControl.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="IPAddressControlDesigner.cs" />
     <Compile Include="NativeMethods.cs" />

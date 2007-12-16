@@ -56,13 +56,16 @@
       <Link>DotControl.cs</Link>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="..\..\VS2005\IPAddressControlLib\FieldChangedEventArgs.cs">
+      <Link>FieldChangedEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\..\VS2005\IPAddressControlLib\FieldControl.cs">
       <Link>FieldControl.cs</Link>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\..\VS2005\IPAddressControlLib\IPAddressControl.cs">
       <Link>IPAddressControl.cs</Link>
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\..\VS2005\IPAddressControlLib\IPAddressControlDesigner.cs">
       <Link>IPAddressControlDesigner.cs</Link>
