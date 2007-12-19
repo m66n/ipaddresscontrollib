@@ -166,7 +166,7 @@ namespace IPAddressControlLib
                if ( TextLength > 0 )
                {
                   int newLength = TextLength - 1;
-                  Text = Text.Substring( 0, newLength );
+                  base.Text = Text.Substring( 0, newLength );
                }
                SelectionStart = TextLength;
                return;
