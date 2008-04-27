@@ -33,40 +33,8 @@ using System.Windows.Forms;
 
 namespace IPAddressControlLib
 {
-   public class FieldChangedEventArgs : EventArgs
-   {
-      private int _fieldIndex;
-      private String _text;
-
-      public int FieldIndex
-      {
-         get 
-         {
-            return _fieldIndex;
-         }
-         set
-         {
-            _fieldIndex = value;
-         }
-      }
-
-      public String Text
-      {
-         get
-         {
-            return _text;
-         }
-         set
-         {
-            _text = value;
-         }
-      }
-   }
-
-   public delegate void FieldChangedEventHandler( object sender, FieldChangedEventArgs e );
-
 	[DesignerAttribute( typeof(IPAddressControlDesigner) )]
-	public class IPAddressControl : System.Windows.Forms.UserControl
+	public class IPAddressControl : System.Windows.Forms.Control
 	{
       public const int FieldCount = 4;
 
@@ -367,7 +335,9 @@ namespace IPAddressControlLib
             _fieldControls[index].Click += new EventHandler( OnSubControlClicked );
             _fieldControls[index].DoubleClick += new EventHandler( OnSubControlDoubleClicked );
             _fieldControls[index].GotFocus += new EventHandler( OnFieldGotFocus );
+            _fieldControls[index].KeyDown += new KeyEventHandler( OnFieldKeyDown );
             _fieldControls[index].KeyPress += new KeyPressEventHandler( OnFieldKeyPressed );
+            _fieldControls[index].KeyUp += new KeyEventHandler( OnFieldKeyUp );
             _fieldControls[index].LostFocus += new EventHandler( OnFieldLostFocus );
             _fieldControls[index].MouseEnter += new EventHandler( OnSubControlMouseEntered );
             _fieldControls[index].MouseHover += new EventHandler( OnSubControlMouseHovered );
@@ -759,9 +729,19 @@ namespace IPAddressControlLib
          }
       }
 
+      private void OnFieldKeyDown( object sender, KeyEventArgs e )
+      {
+         OnKeyDown( e );
+      }
+
       private void OnFieldKeyPressed( object sender, KeyPressEventArgs e )
       {
          OnKeyPress( e );
+      }
+
+      private void OnFieldKeyUp( object sender, KeyEventArgs e )
+      {
+         OnKeyUp( e );
       }
 
       private void OnFieldTextChanged( int fieldIndex, string text )

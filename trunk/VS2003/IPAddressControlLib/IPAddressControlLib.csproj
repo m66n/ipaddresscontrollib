@@ -114,14 +114,29 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
+                    RelPath = "FieldChangedEventArgs.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "FieldControl.cs"
                     SubType = "Component"
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "FieldControl.resx"
+                    DependentUpon = "FieldControl.cs"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "IPAddressControl.cs"
-                    SubType = "UserControl"
+                    SubType = "Component"
                     BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "IPAddressControl.resx"
+                    DependentUpon = "IPAddressControl.cs"
+                    BuildAction = "EmbeddedResource"
                 />
                 <File
                     RelPath = "IPAddressControlDesigner.cs"
