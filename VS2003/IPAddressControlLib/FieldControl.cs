@@ -276,7 +276,7 @@ namespace IPAddressControlLib
          {
             HandleBackspaceKey();
          }
-         else if ( !IsNumericKey( e ) && !IsEditKey( e ) )
+         else if ( !IsNumericKey( e ) && !IsEditKey( e ) && !IsEnterKey( e ) )
          {
             _invalidKeyDown = true;
          }
@@ -287,6 +287,7 @@ namespace IPAddressControlLib
          if ( _invalidKeyDown )
          {
             e.Handled = true;
+            return;
          }
 
          base.OnKeyPress( e );
@@ -431,6 +432,17 @@ namespace IPAddressControlLib
                    ( e.KeyCode == Keys.C ||
                      e.KeyCode == Keys.V ||
                      e.KeyCode == Keys.X ) )
+         {
+            return true;
+         }
+
+         return false;
+      }
+
+      private static bool IsEnterKey( KeyEventArgs e )
+      {
+         if ( e.KeyCode == Keys.Enter ||
+              e.KeyCode == Keys.Return )
          {
             return true;
          }
