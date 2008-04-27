@@ -256,20 +256,20 @@ namespace IPAddressControlLib
          return bytes;
       }
 
-      public void SetAddressBytes( Byte[] bytes )
+      public void SetAddressBytes( Byte[] value )
       {
          Clear();
 
-         if ( bytes == null )
+         if ( value == null )
          {
             return;
          }
 
-         int length = Math.Min( _fieldControls.Length, bytes.Length );
+         int length = Math.Min( _fieldControls.Length, value.Length );
 
          for ( int i = 0; i < length; ++i )
          {
-            _fieldControls[i].Text = bytes[i].ToString( CultureInfo.InvariantCulture );
+            _fieldControls[i].Text = value[i].ToString( CultureInfo.InvariantCulture );
          }
       }
 
