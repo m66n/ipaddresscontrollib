@@ -22,6 +22,7 @@
 
 using System;
 using System.Reflection;
+using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -83,3 +84,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDelaySign(false)]
 [assembly: AssemblyKeyFile(@"..\..\sgKey.snk")]
 [assembly: AssemblyKeyName("")]
+
+[assembly: NeutralResourcesLanguageAttribute( "en-us" )]

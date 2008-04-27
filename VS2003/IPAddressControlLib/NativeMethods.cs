@@ -107,7 +107,7 @@ namespace IPAddressControlLib
       [return: MarshalAs(UnmanagedType.Bool)]
       public static extern bool IsThemeActive();
 
-      [DllImport("uxtheme", CharSet=CharSet.Auto, SetLastError=true)]
+      [DllImport("uxtheme", CharSet=CharSet.Unicode, SetLastError=true)]
       public static extern IntPtr OpenThemeData( IntPtr hWnd, string lpString );
 
       public static bool IsThemed()
