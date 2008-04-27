@@ -326,7 +326,9 @@ namespace IPAddressControlLib
             _fieldControls[index].Click += new EventHandler( OnSubControlClicked );
             _fieldControls[index].DoubleClick += new EventHandler( OnSubControlDoubleClicked );
             _fieldControls[index].GotFocus += new EventHandler( OnFieldGotFocus );
+            _fieldControls[index].KeyDown += new KeyEventHandler( OnFieldKeyDown );
             _fieldControls[index].KeyPress += new KeyPressEventHandler( OnFieldKeyPressed );
+            _fieldControls[index].KeyUp += new KeyEventHandler( OnFieldKeyUp );
             _fieldControls[index].LostFocus += new EventHandler( OnFieldLostFocus );
             _fieldControls[index].MouseClick += new MouseEventHandler( OnSubControlMouseClicked );
             _fieldControls[index].MouseDoubleClick += new MouseEventHandler( OnSubControlMouseDoubleClicked );
@@ -334,6 +336,7 @@ namespace IPAddressControlLib
             _fieldControls[index].MouseHover += new EventHandler( OnSubControlMouseHovered );
             _fieldControls[index].MouseLeave += new EventHandler( OnSubControlMouseLeft );
             _fieldControls[index].MouseMove += new MouseEventHandler( OnSubControlMouseMoved );
+            _fieldControls[index].PreviewKeyDown += new PreviewKeyDownEventHandler( OnFieldPreviewKeyDown );
             _fieldControls[index].TextChangedEvent += new EventHandler<TextChangedEventArgs>( OnFieldTextChanged );
 
             Controls.Add( _fieldControls[index] );
@@ -712,9 +715,24 @@ namespace IPAddressControlLib
          }
       }
 
+      private void OnFieldKeyDown( Object sender, KeyEventArgs e )
+      {
+         OnKeyDown( e );
+      }
+
       private void OnFieldKeyPressed( Object sender, KeyPressEventArgs e )
       {
          OnKeyPress( e );
+      }
+
+      private void OnFieldPreviewKeyDown( Object sender, PreviewKeyDownEventArgs e )
+      {
+         OnPreviewKeyDown( e );
+      }
+
+      private void OnFieldKeyUp( Object sender, KeyEventArgs e )
+      {
+         OnKeyUp( e );
       }
 
       private void OnFieldLostFocus( Object sender, EventArgs e )
