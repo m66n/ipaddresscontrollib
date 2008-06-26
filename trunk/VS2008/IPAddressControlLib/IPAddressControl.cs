@@ -33,7 +33,7 @@ using System.Windows.Forms.VisualStyles;
 namespace IPAddressControlLib
 {
    [DesignerAttribute( typeof( IPAddressControlDesigner ) )]
-   public class IPAddressControl : Control
+   public class IPAddressControl : ContainerControl
    {
       #region Public Constants
 
@@ -368,10 +368,15 @@ namespace IPAddressControlLib
          SetStyle( ControlStyles.OptimizedDoubleBuffer, true );
          SetStyle( ControlStyles.ResizeRedraw, true );
          SetStyle( ControlStyles.UserPaint, true );
+         SetStyle( ControlStyles.FixedWidth, true );
+         SetStyle( ControlStyles.FixedHeight, true );
 
          _referenceTextBox.AutoSize = true;
 
          Cursor = Cursors.IBeam;
+
+         AutoScaleDimensions = new SizeF( 96F, 96F );
+         AutoScaleMode = AutoScaleMode.Dpi;
 
          Size = MinimumSize;
 

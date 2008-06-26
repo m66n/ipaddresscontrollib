@@ -28,76 +28,6 @@ using System.Windows.Forms;
 
 namespace IPAddressControlLib
 {
-   internal enum Direction
-   {
-      Forward,
-      Reverse
-   }
-
-   internal enum Selection
-   {
-      None,
-      All
-   }
-
-   internal enum Action
-   {
-      None,
-      Trim,
-      Home,
-      End
-   }
-
-   internal class CedeFocusEventArgs : EventArgs
-   {
-      private int _fieldIndex;
-      private Action _action;
-      private Direction _direction;
-      private Selection _selection;
-
-      public int FieldIndex
-      {
-         get { return _fieldIndex; }
-         set { _fieldIndex = value; }
-      }
-
-      public Action Action
-      {
-         get { return _action; }
-         set { _action = value; }
-      }
-
-      public Direction Direction
-      {
-         get { return _direction; }
-         set { _direction = value; }
-      }
-
-      public Selection Selection
-      {
-         get { return _selection; }
-         set { _selection = value; }
-      }
-   }
-
-   internal class TextChangedEventArgs : EventArgs
-   {
-      private int _fieldIndex;
-      private String _text;
-
-      public int FieldIndex
-      {
-         get { return _fieldIndex; }
-         set { _fieldIndex = value; }
-      }
-
-      public String Text
-      {
-         get { return _text; }
-         set { _text = value; }
-      }
-   }
-
    internal class FieldControl : TextBox
    {
       #region Public Constants
@@ -575,4 +505,75 @@ namespace IPAddressControlLib
 
       #endregion // Private Data
    }
+
+   internal enum Direction
+   {
+      Forward,
+      Reverse
+   }
+
+   internal enum Selection
+   {
+      None,
+      All
+   }
+
+   internal enum Action
+   {
+      None,
+      Trim,
+      Home,
+      End
+   }
+
+   internal class CedeFocusEventArgs : EventArgs
+   {
+      private int _fieldIndex;
+      private Action _action;
+      private Direction _direction;
+      private Selection _selection;
+
+      public int FieldIndex
+      {
+         get { return _fieldIndex; }
+         set { _fieldIndex = value; }
+      }
+
+      public Action Action
+      {
+         get { return _action; }
+         set { _action = value; }
+      }
+
+      public Direction Direction
+      {
+         get { return _direction; }
+         set { _direction = value; }
+      }
+
+      public Selection Selection
+      {
+         get { return _selection; }
+         set { _selection = value; }
+      }
+   }
+
+   internal class TextChangedEventArgs : EventArgs
+   {
+      private int _fieldIndex;
+      private String _text;
+
+      public int FieldIndex
+      {
+         get { return _fieldIndex; }
+         set { _fieldIndex = value; }
+      }
+
+      public String Text
+      {
+         get { return _text; }
+         set { _text = value; }
+      }
+   }
+
 }

@@ -36,13 +36,16 @@ namespace IPAddressControlLib
       {
          get
          {
-            Graphics g = Graphics.FromHwnd( Handle );
+            Size minimumSize;
 
-            Size minimumSize = TextRenderer.MeasureText( g,
-               Text, Font, Size,
-               _textFormatFlags );
+            using ( Graphics g = Graphics.FromHwnd( Handle ) )
+            {
+               TextFormatFlags flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix |
+                  TextFormatFlags.SingleLine | TextFormatFlags.NoPadding;
 
-            g.Dispose();
+               minimumSize = TextRenderer.MeasureText( g,
+                  Text, Font, Size, flags );
+            }
 
             return minimumSize;
          }
@@ -86,6 +89,9 @@ namespace IPAddressControlLib
          SetStyle( ControlStyles.OptimizedDoubleBuffer, true );
          SetStyle( ControlStyles.ResizeRedraw, true );
          SetStyle( ControlStyles.UserPaint, true );
+
+         _stringFormat = new StringFormat();
+         _stringFormat.Alignment = StringAlignment.Center;
       }
 
       #endregion // Constructors
@@ -131,8 +137,17 @@ namespace IPAddressControlLib
             e.Graphics.FillRectangle( backgroundBrush, ClientRectangle );
          }
 
-         TextRenderer.DrawText( e.Graphics, Text, Font, ClientRectangle,
-            textColor, _textFormatFlags );
+         //TextRenderer.DrawText( e.Graphics, Text, Font, ClientRectangle,
+            //textColor, _textFormatFlags );
+
+         // Graphics.DrawString() has the proper baseline when screen
+         // resolution is 120 dpi
+         //
+         using ( SolidBrush foregroundBrush = new SolidBrush( textColor ) )
+         {
+            e.Graphics.DrawString( Text, Font, foregroundBrush,
+               ClientRectangle, _stringFormat );
+         }
       }
 
       protected override void OnParentBackColorChanged( EventArgs e )
@@ -161,8 +176,7 @@ namespace IPAddressControlLib
       private bool _backColorChanged;
       private bool _readOnly;
 
-      private TextFormatFlags _textFormatFlags = TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix |
-         TextFormatFlags.SingleLine | TextFormatFlags.NoPadding;
+      private StringFormat _stringFormat;
 
       #endregion // Private Data
    }
