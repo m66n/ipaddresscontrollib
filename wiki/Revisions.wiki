@@ -1,0 +1,5 @@
+= Revision 37 =
+
+  * Changed base of `IPAddressControl` to `ContainerControl` so that it's `AutoScaleMode` could be set to `AutoScaleMode.Dpi`.  Also set the `FixedWidth` and `FixedHeight` control styles to true.  These changes fix rendering problems when screen resolution is 120 dpi.
+  * Using `Graphics.DrawString()` rather than `TextRenderer.DrawText()` in `DotControl`.  `TextRenderer` does not use the correct baseline at 120 dpi.
+  * Rearranged some `enum` and `EventArgs` so that each control class is the first class in its file.
