@@ -33,6 +33,43 @@
 
 === Revision 15 (2-Jul-07) ===
 
+  * Initial release at Google Code.
   * Text set in design mode is persisted.
   * Removed override of `AutoSize`.  Use `AutoHeight` instead.
   * <VS05> Modified size calculations to conserve horizontal space.
+
+
+=== Prior Changes ===
+
+  * 6-Mar-07
+    * Now checks for `null` when parsing incoming text.
+
+  * 21-Feb-07
+    * Added handling of `Keys.Backspace` across fields.
+    * Added better handling of `Keys.Delete`, and new handlers for `Keys.Home` and `Keys.End`.
+    * <VS05> Modified the `MinimumSize` property of `DotControl` to tighten up the spacing.
+
+  * 5-May-06
+    * <VS05> Added `Baseline` to the `SnapLines` collection for the `ControlDesigner` class. Made `Text` property browsable in design mode. Fixed a control sizing bug when large fonts are used.
+
+  * 13-Oct-05
+    * Compliant with !FxCop 1.32.
+
+  * 17-Sep-05
+    * Enhanced to support Windows XP visual styles.
+
+  * 3-Aug-05
+    * Bug fix for `Focused` property.
+
+  * 22-Mar-05
+    * Added a call to `OnTextChanged()` for the control when the text of any field changes.
+
+  * 6-Feb-05
+    * Added missing key handlers.
+    * Added sizing.
+    * Added `ReadOnly` property.
+    * Non-standard color choices now render properly.
+    * Added an event to notify clients of text change.
+
+  * 20-Jan-05
+    * Initial release.
