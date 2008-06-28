@@ -1,11 +1,10 @@
 #summary A list of changes for each released revision
 
-=== Revision 37 (27-Jun-08) ===
+=== Revision 44 (28-Jun-08) ===
 
   * Changed base of `IPAddressControl` to `ContainerControl` so that it's `AutoScaleMode` could be set to `AutoScaleMode.Dpi`.  Also set the `FixedWidth` and `FixedHeight` control styles to true.  These changes fix rendering problems when screen resolution is 120 dpi.
   * Using `Graphics.DrawString()` rather than `TextRenderer.DrawText()` in `DotControl`.  `TextRenderer` does not use the correct baseline at 120 dpi.
   * Rearranged some `enum` and `EventArgs` so that each control class is the first class in its file.
-
 
 === Revision 36 (27-Apr-08) ===
 
@@ -15,7 +14,6 @@
 === Revision 29 (16-Dec-07) ===
 
   * Added a Visual Studio 2008 project.  The VS 2005 and VS 2008 projects have the same source code.  Some minor changes were made to remove code analysis warnings.
-
 
 === Revision 26 (23-Oct-07) ===
 
@@ -30,14 +28,12 @@
   * Removed a potential resource leak when calculating text size and added a `null` check for `SetAddressBytes()`.
   * Compliant with !FxCop 1.35.
 
-
 === Revision 15 (2-Jul-07) ===
 
   * Initial release at Google Code.
   * Text set in design mode is persisted.
   * Removed override of `AutoSize`.  Use `AutoHeight` instead.
   * <VS05> Modified size calculations to conserve horizontal space.
-
 
 === Prior Changes ===
 
