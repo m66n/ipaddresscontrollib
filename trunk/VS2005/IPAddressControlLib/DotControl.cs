@@ -36,18 +36,18 @@ namespace IPAddressControlLib
       {
          get
          {
-            Size minimumSize;
-
             using ( Graphics g = Graphics.FromHwnd( Handle ) )
             {
-               TextFormatFlags flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.NoPrefix |
-                  TextFormatFlags.SingleLine | TextFormatFlags.NoPadding;
-
-               minimumSize = TextRenderer.MeasureText( g,
-                  Text, Font, Size, flags );
+               _sizeText = g.MeasureString( Text, Font, -1, _stringFormat );
             }
 
-            return minimumSize;
+            // MeasureString() cuts off the bottom pixel for descenders no matter
+            // which StringFormatFlags are chosen.  This doesn't matter for '.' but
+            // it's here in case someone wants to modify the text.
+            //
+            _sizeText.Height += 1F;
+
+            return _sizeText.ToSize();
          }
       }
 
@@ -81,6 +81,9 @@ namespace IPAddressControlLib
       {
          Text = Properties.Resources.FieldSeparator;
 
+         _stringFormat = StringFormat.GenericTypographic;
+         _stringFormat.FormatFlags = StringFormatFlags.MeasureTrailingSpaces;
+
          BackColor = SystemColors.Window;
          Size = MinimumSize;
          TabStop = false;
@@ -90,8 +93,8 @@ namespace IPAddressControlLib
          SetStyle( ControlStyles.ResizeRedraw, true );
          SetStyle( ControlStyles.UserPaint, true );
 
-         _stringFormat = new StringFormat();
-         _stringFormat.Alignment = StringAlignment.Center;
+         SetStyle( ControlStyles.FixedHeight, true );
+         SetStyle( ControlStyles.FixedWidth, true );
       }
 
       #endregion // Constructors
@@ -137,16 +140,11 @@ namespace IPAddressControlLib
             e.Graphics.FillRectangle( backgroundBrush, ClientRectangle );
          }
 
-         //TextRenderer.DrawText( e.Graphics, Text, Font, ClientRectangle,
-            //textColor, _textFormatFlags );
-
-         // Graphics.DrawString() has the proper baseline when screen
-         // resolution is 120 dpi
-         //
-         using ( SolidBrush foregroundBrush = new SolidBrush( textColor ) )
+         using ( SolidBrush foreBrush = new SolidBrush( textColor ) )
          {
-            e.Graphics.DrawString( Text, Font, foregroundBrush,
-               ClientRectangle, _stringFormat );
+            float x = (float)ClientRectangle.Width / 2F - _sizeText.Width / 2F;
+            e.Graphics.DrawString( Text, Font, foreBrush,
+               new RectangleF( x, 0F, _sizeText.Width, _sizeText.Height ), _stringFormat );
          }
       }
 
@@ -177,6 +175,7 @@ namespace IPAddressControlLib
       private bool _readOnly;
 
       private StringFormat _stringFormat;
+      private SizeF _sizeText;
 
       #endregion // Private Data
    }
