@@ -5,7 +5,6 @@
   * Changed base of `IPAddressControl` to `ContainerControl` so that its `AutoScaleMode` could be set to `AutoScaleMode.Dpi`.  Also set the `FixedWidth` and `FixedHeight` control styles to true.  These changes fix rendering problems when screen resolution is 120 dpi.
   * Using `Graphics.DrawString()` rather than `TextRenderer.DrawText()` in `DotControl`.  `TextRenderer` does not use the correct baseline at 120 dpi.
   * Rearranged some `enum` and `EventArgs` so that each control class is the first class in its file.
-  * <VS03> Unable to fix 120 dpi rendering issues with this code base. If you have any ideas, please let me know.
 
 === Revision 36 (27-Apr-08) ===
 
