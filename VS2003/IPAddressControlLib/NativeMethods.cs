@@ -114,8 +114,9 @@ namespace IPAddressControlLib
       {
          bool retval = false;
 
-         if ( Environment.OSVersion.Version.Major >= 5 &&
-              Environment.OSVersion.Version.Minor >= 1 )
+         if ( ( Environment.OSVersion.Version.Major == 5 &&
+                Environment.OSVersion.Version.Minor >= 1 ) ||
+               Environment.OSVersion.Version.Major > 5 )
          {
             bool appThemed   = NativeMethods.IsAppThemed();
             bool themeActive = NativeMethods.IsThemeActive();
