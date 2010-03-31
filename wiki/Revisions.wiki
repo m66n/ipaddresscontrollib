@@ -33,7 +33,7 @@
   * Initial release at Google Code.
   * Text set in design mode is persisted.
   * Removed override of `AutoSize`.  Use `AutoHeight` instead.
-  * <VS05> Modified size calculations to conserve horizontal space.
+  * (VS05) Modified size calculations to conserve horizontal space.
 
 === Prior Changes ===
 
@@ -43,10 +43,10 @@
   * 21-Feb-07
     * Added handling of `Keys.Backspace` across fields.
     * Added better handling of `Keys.Delete`, and new handlers for `Keys.Home` and `Keys.End`.
-    * <VS05> Modified the `MinimumSize` property of `DotControl` to tighten up the spacing.
+    * (VS05) Modified the `MinimumSize` property of `DotControl` to tighten up the spacing.
 
   * 5-May-06
-    * <VS05> Added `Baseline` to the `SnapLines` collection for the `ControlDesigner` class. Made `Text` property browsable in design mode. Fixed a control sizing bug when large fonts are used.
+    * (VS05) Added `Baseline` to the `SnapLines` collection for the `ControlDesigner` class. Made `Text` property browsable in design mode. Fixed a control sizing bug when large fonts are used.
 
   * 13-Oct-05
     * Compliant with !FxCop 1.32.
