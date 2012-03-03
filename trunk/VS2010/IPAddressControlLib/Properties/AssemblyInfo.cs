@@ -36,7 +36,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("IPAddressControlLib")]
-[assembly: AssemblyCopyright("Copyright ©  2012")]
+[assembly: AssemblyCopyright( "Copyright © 2007-2012 Michael Chapman" )]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
