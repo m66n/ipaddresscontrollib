@@ -174,6 +174,23 @@ namespace IPAddressControlLib
          }
       }
 
+      [Browsable( false ), DesignerSerializationVisibility( DesignerSerializationVisibility.Hidden )]
+      public IPAddress IPAddress
+      {
+         get { return new IPAddress( GetAddressBytes() ); }
+         set
+         {
+            Clear();
+
+            if ( null == value ) { return; }
+
+            if ( value.AddressFamily == AddressFamily.InterNetwork )
+            {
+               SetAddressBytes( value.GetAddressBytes() );
+            }
+         }
+      }
+
       [Browsable( true )]
       public override Size MinimumSize
       {
@@ -241,12 +258,6 @@ namespace IPAddressControlLib
          }
       }
 
-      [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "If property, form designer autogenerates an IPAddress." )]
-      public IPAddress GetAddress()
-      {
-         return new IPAddress( GetAddressBytes() );
-      }
-
       public byte[] GetAddressBytes()
       {
          byte[] bytes = new byte[FieldCount];
@@ -257,18 +268,6 @@ namespace IPAddressControlLib
          }
 
          return bytes;
-      }
-
-      public void SetAddress(IPAddress value)
-      {
-         Clear();
-
-         if ( null == value ) { return; }
-
-         if ( value.AddressFamily == AddressFamily.InterNetwork )
-         {
-            SetAddressBytes( value.GetAddressBytes() );
-         }
       }
 
       [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", Justification = "Using Bytes seems more informative than SetAddressValues." )]
@@ -483,7 +482,12 @@ namespace IPAddressControlLib
 
                if ( Application.RenderWithVisualStyles )
                {
-                  ControlPaint.DrawVisualStyleBorder( e.Graphics, rectBorder );
+                  using ( Pen pen = new Pen( VisualStyleInformation.TextControlBorder ) )
+                  {
+                     e.Graphics.DrawRectangle( pen, rectBorder );
+                  }
+                  rectBorder.Inflate( -1, -1 );
+                  e.Graphics.DrawRectangle( SystemPens.Window, rectBorder );
                }
                else
                {
