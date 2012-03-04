@@ -110,6 +110,8 @@ namespace IPAddressControlLib
 
       protected override void OnPaint( PaintEventArgs e )
       {
+         if ( null == e ) { throw new ArgumentNullException( "e" ); }
+
          base.OnPaint( e );
 
          Color backColor = BackColor;
