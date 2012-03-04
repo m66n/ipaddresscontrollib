@@ -215,6 +215,8 @@ namespace IPAddressControlLib
 
       protected override void OnKeyDown( KeyEventArgs e )
       {
+         if ( null == e ) { throw new ArgumentNullException( "e" ); }
+
          base.OnKeyDown( e );
 
          switch ( e.KeyCode )

@@ -408,6 +408,12 @@ namespace IPAddressControlLib
 
       #region Protected Methods
 
+      protected override void Dispose( bool disposing )
+      {
+         if ( disposing ) { Cleanup(); }
+         base.Dispose( disposing );
+      }
+
       protected override void OnBackColorChanged( EventArgs e )
       {
          base.OnBackColorChanged( e );
@@ -456,6 +462,8 @@ namespace IPAddressControlLib
 
       protected override void OnPaint( PaintEventArgs e )
       {
+         if ( null == e ) { throw new ArgumentNullException( "e" ); }
+
          base.OnPaint( e );
 
          Color backColor = BackColor;
@@ -580,6 +588,24 @@ namespace IPAddressControlLib
          }
 
          return minimumSize;
+      }
+
+      private void Cleanup()
+      {
+         foreach ( DotControl dc in _dotControls )
+         {
+            Controls.Remove( dc );
+            dc.Dispose();
+         }
+
+         foreach ( FieldControl fc in _fieldControls )
+         {
+            Controls.Remove( fc );
+            fc.Dispose();
+         }
+
+         _dotControls = null;
+         _fieldControls = null;
       }
 
       private int GetSuggestedHeight()
