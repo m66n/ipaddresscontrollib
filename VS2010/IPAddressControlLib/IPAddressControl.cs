@@ -23,6 +23,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
@@ -242,7 +243,22 @@ namespace IPAddressControlLib
          }
          set
          {
-            Parse( value );
+            Clear();
+
+            if ( null == value ) { return; }
+
+            List<string> separators = new List<string>();
+            foreach ( DotControl dc in _dotControls )
+            {
+               separators.Add( dc.Text );
+            }
+               
+            string[] fields = Parse( value, separators.ToArray() );
+
+            for ( int i = 0; i < Math.Min( _fieldControls.Length, fields.Length ); ++i )
+            {
+               _fieldControls[ i ].Text = fields[ i ];
+            }
          }
       }
 
@@ -356,6 +372,7 @@ namespace IPAddressControlLib
             _fieldControls[index].MouseHover += new EventHandler( OnSubControlMouseHovered );
             _fieldControls[index].MouseLeave += new EventHandler( OnSubControlMouseLeft );
             _fieldControls[index].MouseMove += new MouseEventHandler( OnSubControlMouseMoved );
+            _fieldControls[index].PasteEvent += new EventHandler<PasteEventArgs>( OnPaste );
             _fieldControls[index].PreviewKeyDown += new PreviewKeyDownEventHandler( OnFieldPreviewKeyDown );
             _fieldControls[index].TextChangedEvent += new EventHandler<TextChangedEventArgs>( OnFieldTextChanged );
 
@@ -390,8 +407,6 @@ namespace IPAddressControlLib
          SetStyle( ControlStyles.UserPaint, true );
          SetStyle( ControlStyles.FixedWidth, true );
          SetStyle( ControlStyles.FixedHeight, true );
-
-         _referenceTextBox.AutoSize = true;
 
          Cursor = Cursors.IBeam;
 
@@ -610,9 +625,15 @@ namespace IPAddressControlLib
 
       private int GetSuggestedHeight()
       {
-         _referenceTextBox.BorderStyle = BorderStyle;
-         _referenceTextBox.Font = Font;
-         return _referenceTextBox.Height;
+         int height = 0;
+         using ( TextBox reference = new TextBox() )
+         {
+            reference.AutoSize = true;
+            reference.BorderStyle = BorderStyle;
+            reference.Font = Font;
+            height = reference.Height;
+         }
+         return height;
       }
 
       [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Usage", "CA1806", Justification = "What should be done if ReleaseDC() doesn't work?" )]
@@ -813,6 +834,11 @@ namespace IPAddressControlLib
          OnTextChanged( EventArgs.Empty );
       }
 
+      private void OnPaste( Object sender, PasteEventArgs e )
+      {
+         Text = e.Text;
+      }
+
       private void OnSubControlClicked( object sender, EventArgs e )
       {
          OnClick( e );
@@ -853,27 +879,21 @@ namespace IPAddressControlLib
          OnMouseMove( e );
       }
 
-      private void Parse( String text )
+      private static String[] Parse( String text, String[] separators )
       {
-         Clear();
-
-         if ( null == text )
-         {
-            return;
-         }
+         List<String> result = new List<String>();
 
          int textIndex = 0;
-
          int index = 0;
 
-         for ( index = 0; index < _dotControls.Length; ++index )
+         for ( index = 0; index < separators.Length; ++index )
          {
-            int findIndex = text.IndexOf( _dotControls[index].Text, textIndex, StringComparison.Ordinal );
+            int findIndex = text.IndexOf( separators[ index ], textIndex, StringComparison.Ordinal );
 
             if ( findIndex >= 0 )
             {
-               _fieldControls[index].Text = text.Substring( textIndex, findIndex - textIndex );
-               textIndex = findIndex + _dotControls[index].Text.Length;
+               result.Add( text.Substring( textIndex, findIndex - textIndex ) );
+               textIndex = findIndex + separators[ index ].Length;
             }
             else
             {
@@ -881,10 +901,12 @@ namespace IPAddressControlLib
             }
          }
 
-         _fieldControls[index].Text = text.Substring( textIndex );
+         result.Add( text.Substring( textIndex ) );
+
+         return result.ToArray();
       }
 
-      // a hack to remove an FxCop warning
+       // a hack to remove an FxCop warning
       private void ResetBackColorChanged()
       {
          _backColorChanged = false;
@@ -905,8 +927,6 @@ namespace IPAddressControlLib
 
       private Size Fixed3DOffset = new Size( 3, 3 );
       private Size FixedSingleOffset = new Size( 2, 2 );
-
-      private TextBox _referenceTextBox = new TextBox();
 
       #endregion  // Private Data
    }
