@@ -1,4 +1,5 @@
-// Copyright (c) 2007 Michael Chapman
+// Copyright (c) 2007-2012  Michael Chapman
+// http://ipaddresscontrollib.googlecode.com
 
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -22,9 +23,12 @@
 
 using System;
 using System.ComponentModel;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Windows.Forms; 
 using System.Windows.Forms.VisualStyles;
@@ -171,6 +175,23 @@ namespace IPAddressControlLib
          }
       }
 
+      [Browsable( false ), DesignerSerializationVisibility( DesignerSerializationVisibility.Hidden )]
+      public IPAddress IPAddress
+      {
+         get { return new IPAddress( GetAddressBytes() ); }
+         set
+         {
+            Clear();
+
+            if ( null == value ) { return; }
+
+            if ( value.AddressFamily == AddressFamily.InterNetwork )
+            {
+               SetAddressBytes( value.GetAddressBytes() );
+            }
+         }
+      }
+
       [Browsable( true )]
       public override Size MinimumSize
       {
@@ -222,7 +243,22 @@ namespace IPAddressControlLib
          }
          set
          {
-            Parse( value );
+            Clear();
+
+            if ( null == value ) { return; }
+
+            List<string> separators = new List<string>();
+            foreach ( DotControl dc in _dotControls )
+            {
+               separators.Add( dc.Text );
+            }
+               
+            string[] fields = Parse( value, separators.ToArray() );
+
+            for ( int i = 0; i < Math.Min( _fieldControls.Length, fields.Length ); ++i )
+            {
+               _fieldControls[ i ].Text = fields[ i ];
+            }
          }
       }
 
@@ -250,7 +286,7 @@ namespace IPAddressControlLib
          return bytes;
       }
 
-      [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Naming", "CA1720", Justification = "Prefer to use bytes as a variable name." )]
+      [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", Justification = "Using Bytes seems more informative than SetAddressValues." )]
       public void SetAddressBytes( byte[] bytes )
       {
          Clear();
@@ -336,6 +372,7 @@ namespace IPAddressControlLib
             _fieldControls[index].MouseHover += new EventHandler( OnSubControlMouseHovered );
             _fieldControls[index].MouseLeave += new EventHandler( OnSubControlMouseLeft );
             _fieldControls[index].MouseMove += new MouseEventHandler( OnSubControlMouseMoved );
+            _fieldControls[index].PasteEvent += new EventHandler<PasteEventArgs>( OnPaste );
             _fieldControls[index].PreviewKeyDown += new PreviewKeyDownEventHandler( OnFieldPreviewKeyDown );
             _fieldControls[index].TextChangedEvent += new EventHandler<TextChangedEventArgs>( OnFieldTextChanged );
 
@@ -371,8 +408,6 @@ namespace IPAddressControlLib
          SetStyle( ControlStyles.FixedWidth, true );
          SetStyle( ControlStyles.FixedHeight, true );
 
-         _referenceTextBox.AutoSize = true;
-
          Cursor = Cursors.IBeam;
 
          AutoScaleDimensions = new SizeF( 96F, 96F );
@@ -387,6 +422,12 @@ namespace IPAddressControlLib
       #endregion // Constructors
 
       #region Protected Methods
+
+      protected override void Dispose( bool disposing )
+      {
+         if ( disposing ) { Cleanup(); }
+         base.Dispose( disposing );
+      }
 
       protected override void OnBackColorChanged( EventArgs e )
       {
@@ -436,6 +477,8 @@ namespace IPAddressControlLib
 
       protected override void OnPaint( PaintEventArgs e )
       {
+         if ( null == e ) { throw new ArgumentNullException( "e" ); }
+
          base.OnPaint( e );
 
          Color backColor = BackColor;
@@ -462,7 +505,12 @@ namespace IPAddressControlLib
 
                if ( Application.RenderWithVisualStyles )
                {
-                  ControlPaint.DrawVisualStyleBorder( e.Graphics, rectBorder );
+                  using ( Pen pen = new Pen( VisualStyleInformation.TextControlBorder ) )
+                  {
+                     e.Graphics.DrawRectangle( pen, rectBorder );
+                  }
+                  rectBorder.Inflate( -1, -1 );
+                  e.Graphics.DrawRectangle( SystemPens.Window, rectBorder );
                }
                else
                {
@@ -557,11 +605,35 @@ namespace IPAddressControlLib
          return minimumSize;
       }
 
+      private void Cleanup()
+      {
+         foreach ( DotControl dc in _dotControls )
+         {
+            Controls.Remove( dc );
+            dc.Dispose();
+         }
+
+         foreach ( FieldControl fc in _fieldControls )
+         {
+            Controls.Remove( fc );
+            fc.Dispose();
+         }
+
+         _dotControls = null;
+         _fieldControls = null;
+      }
+
       private int GetSuggestedHeight()
       {
-         _referenceTextBox.BorderStyle = BorderStyle;
-         _referenceTextBox.Font = Font;
-         return _referenceTextBox.Height;
+         int height = 0;
+         using ( TextBox reference = new TextBox() )
+         {
+            reference.AutoSize = true;
+            reference.BorderStyle = BorderStyle;
+            reference.Font = Font;
+            height = reference.Height;
+         }
+         return height;
       }
 
       [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Usage", "CA1806", Justification = "What should be done if ReleaseDC() doesn't work?" )]
@@ -762,6 +834,11 @@ namespace IPAddressControlLib
          OnTextChanged( EventArgs.Empty );
       }
 
+      private void OnPaste( Object sender, PasteEventArgs e )
+      {
+         Text = e.Text;
+      }
+
       private void OnSubControlClicked( object sender, EventArgs e )
       {
          OnClick( e );
@@ -802,27 +879,21 @@ namespace IPAddressControlLib
          OnMouseMove( e );
       }
 
-      private void Parse( String text )
+      private static String[] Parse( String text, String[] separators )
       {
-         Clear();
-
-         if ( null == text )
-         {
-            return;
-         }
+         List<String> result = new List<String>();
 
          int textIndex = 0;
-
          int index = 0;
 
-         for ( index = 0; index < _dotControls.Length; ++index )
+         for ( index = 0; index < separators.Length; ++index )
          {
-            int findIndex = text.IndexOf( _dotControls[index].Text, textIndex, StringComparison.Ordinal );
+            int findIndex = text.IndexOf( separators[ index ], textIndex, StringComparison.Ordinal );
 
             if ( findIndex >= 0 )
             {
-               _fieldControls[index].Text = text.Substring( textIndex, findIndex - textIndex );
-               textIndex = findIndex + _dotControls[index].Text.Length;
+               result.Add( text.Substring( textIndex, findIndex - textIndex ) );
+               textIndex = findIndex + separators[ index ].Length;
             }
             else
             {
@@ -830,10 +901,12 @@ namespace IPAddressControlLib
             }
          }
 
-         _fieldControls[index].Text = text.Substring( textIndex );
+         result.Add( text.Substring( textIndex ) );
+
+         return result.ToArray();
       }
 
-      // a hack to remove an FxCop warning
+       // a hack to remove an FxCop warning
       private void ResetBackColorChanged()
       {
          _backColorChanged = false;
@@ -854,8 +927,6 @@ namespace IPAddressControlLib
 
       private Size Fixed3DOffset = new Size( 3, 3 );
       private Size FixedSingleOffset = new Size( 2, 2 );
-
-      private TextBox _referenceTextBox = new TextBox();
 
       #endregion  // Private Data
    }

@@ -1,4 +1,5 @@
-// Copyright (c) 2007 Michael Chapman
+// Copyright (c) 2007-2012  Michael Chapman
+// http://ipaddresscontrollib.googlecode.com
 
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -23,6 +24,7 @@
 using System;
 using System.Drawing;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 
@@ -40,6 +42,7 @@ namespace IPAddressControlLib
       #region Public Events
 
       public event EventHandler<CedeFocusEventArgs> CedeFocusEvent;
+      public event EventHandler<PasteEventArgs> PasteEvent;
       public event EventHandler<TextChangedEventArgs> TextChangedEvent;
 
       #endregion // Public Events
@@ -214,6 +217,8 @@ namespace IPAddressControlLib
 
       protected override void OnKeyDown( KeyEventArgs e )
       {
+         if ( null == e ) { throw new ArgumentNullException( "e" ); }
+
          base.OnKeyDown( e );
 
          switch ( e.KeyCode )
@@ -359,8 +364,12 @@ namespace IPAddressControlLib
       {
          switch ( m.Msg )
          {
-            case 0x007b:  // WM_CONTEXTMENU
-               return;
+            case 0x0302:  // WM_PASTE
+               if ( OnPaste() )
+               {
+                  return;
+               }
+               break;
          }
 
          base.WndProc( ref m );
@@ -444,6 +453,12 @@ namespace IPAddressControlLib
          return false;
       }
 
+      private static bool IsInteger( string text )
+      {
+         Match match = Regex.Match( text, @"^[0-9]+$" );
+         return match.Success;
+      }
+
       private static bool IsNumericKey( KeyEventArgs e )
       {
          if ( e.KeyCode < Keys.NumPad0 || e.KeyCode > Keys.NumPad9 )
@@ -463,6 +478,31 @@ namespace IPAddressControlLib
               e.KeyCode == Keys.Up )
          {
             return true;
+         }
+
+         return false;
+      }
+
+      private bool OnPaste()
+      {
+         if ( Clipboard.ContainsText() )
+         {
+            string text = Clipboard.GetText();
+            if ( IsInteger( text ) )
+            {
+               return false;  // handle locally
+            }
+            else
+            {
+               if ( null != PasteEvent )
+               {
+                  PasteEventArgs args = new PasteEventArgs();
+                  args.FieldIndex = FieldIndex;
+                  args.Text = text;
+                  PasteEvent( this, args );
+                  return true;  // let parent handle it
+               }
+            }
          }
 
          return false;
@@ -555,6 +595,25 @@ namespace IPAddressControlLib
       {
          get { return _selection; }
          set { _selection = value; }
+      }
+   }
+
+   internal class PasteEventArgs : EventArgs
+   {
+      private int _fieldIndex;
+      private String _text;
+
+      public int FieldIndex
+      {
+         [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "FieldIndex may be useful if an error callout is displayed in the future." )]
+         get { return _fieldIndex; }
+         set { _fieldIndex = value; }
+      }
+
+      public String Text
+      {
+         get { return _text; }
+         set { _text = value; }
       }
    }
 

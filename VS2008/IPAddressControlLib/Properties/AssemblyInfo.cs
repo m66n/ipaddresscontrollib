@@ -1,4 +1,5 @@
-﻿// Copyright (c) 2007 Michael Chapman
+﻿// Copyright (c) 2007-2012  Michael Chapman
+// http://ipaddresscontrollib.googlecode.com
 
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,6 +22,7 @@
 
 
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -59,3 +61,5 @@ using System.Resources;
 [assembly: AssemblyVersion( "1.1.*" )]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 [assembly: CLSCompliant( true )]
+
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "IPAddressControlLib")]
