@@ -1,6 +1,6 @@
 # ipaddresscontrollib
 
-![alt IPAddressControl in use](https://raw.githubusercontent.com/m66n/m66n.github.io/master/img/TestIPAddressControl.png)
+![alt IPAddressControl in use](https://raw.githubusercontent.com/m66n/m66n.github.io/master/img/ipaddresscontrollib/TestIPAddressControl.png)
 
 ## Introduction
 
@@ -12,7 +12,7 @@ If you need a C# IPv6 address control or a C# MAC address control, take a look a
 
 `IPAddressControl` is a `ContainerControl` that aggregates four specialized `TextBox` controls of type `FieldCtrl` and three specialized Controls of type `DotCtrl`.
 
-![alt close up view of IPAddressControl](https://raw.githubusercontent.com/m66n/m66n.github.io/master/img/close_up.gif)
+![alt close up view of IPAddressControl](https://raw.githubusercontent.com/m66n/m66n.github.io/master/img/ipaddresscontrollib/close_up.gif)
 
 The `FieldCtrl`s do some validation and keyboard filtering in addition to standard `TextBox` behavior. The `DotCtrl`s do nothing but draw a dot. 
 
