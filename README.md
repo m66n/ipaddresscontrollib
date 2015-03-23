@@ -52,3 +52,5 @@ IPAddress ipAddress = new IPAddress( ipAddressControl.GetAddressBytes() );
 ```
 
 Update: The VS2010 version of this code adds an `IPAddress` property that renders the above unnecessary.
+
+Copyright (c) Michael Chapman. All rights reserved.
