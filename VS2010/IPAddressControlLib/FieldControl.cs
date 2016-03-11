@@ -145,6 +145,27 @@ namespace IPAddressControlLib
 
       #region Public Methods
 
+      public void PasteText( string text )
+      {
+         if (text == null || text == String.Empty)
+         {
+            return;
+         }
+
+         byte result;
+
+         if ( !Byte.TryParse( text, out result ) || result < RangeLower )
+         {
+            result = RangeLower;
+         }
+         else if ( result > RangeUpper )
+         {
+            result = RangeUpper;
+         }
+
+         Text = result.ToString( CultureInfo.InvariantCulture );
+      }
+
       public void TakeFocus( Action action )
       {
          Focus();

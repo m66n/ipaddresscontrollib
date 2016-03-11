@@ -36,6 +36,7 @@ using System.Windows.Forms.VisualStyles;
 
 namespace IPAddressControlLib
 {
+   [DefaultEvent( "TextChanged" )]
    [DesignerAttribute( typeof( IPAddressControlDesigner ) )]
    public class IPAddressControl : ContainerControl
    {
@@ -257,7 +258,7 @@ namespace IPAddressControlLib
 
             for ( int i = 0; i < Math.Min( _fieldControls.Length, fields.Length ); ++i )
             {
-               _fieldControls[ i ].Text = fields[ i ];
+               _fieldControls[ i ].PasteText( fields[ i ] );
             }
          }
       }
