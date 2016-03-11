@@ -154,7 +154,12 @@ namespace IPAddressControlLib
 
       byte result;
 
-      if (!Byte.TryParse(text, out result) || result < RangeLower)
+      if (!Byte.TryParse(text, out result))
+      {
+        return;
+      }
+
+      if (result < RangeLower)
       {
         result = RangeLower;
       }
