@@ -147,6 +147,11 @@ namespace IPAddressControlLib
 
     public void PasteText(string text)
     {
+      if (String.IsNullOrEmpty(text))
+      {
+        return;
+      }
+
       byte result;
 
       if (!Byte.TryParse(text, out result) || result < RangeLower)
