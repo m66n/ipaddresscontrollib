@@ -27,35 +27,35 @@ using System.Windows.Forms.Design.Behavior;
 
 namespace IPAddressControlLib
 {
-    internal class IpAddressControlDesigner : ControlDesigner
+  internal class IpAddressControlDesigner : ControlDesigner
+  {
+    public override SelectionRules SelectionRules
     {
-        public override SelectionRules SelectionRules
+      get
+      {
+        var control = (IPAddressControl)Control;
+
+        if (control.AutoHeight)
         {
-            get
-            {
-                var control = (IPAddressControl) Control;
-
-                if (control.AutoHeight)
-                {
-                    return SelectionRules.Moveable | SelectionRules.Visible | SelectionRules.LeftSizeable |
-                           SelectionRules.RightSizeable;
-                }
-                return SelectionRules.AllSizeable | SelectionRules.Moveable | SelectionRules.Visible;
-            }
+          return SelectionRules.Moveable | SelectionRules.Visible | SelectionRules.LeftSizeable |
+                 SelectionRules.RightSizeable;
         }
-
-        public override IList SnapLines
-        {
-            get
-            {
-                var control = (IPAddressControl) Control;
-
-                var snapLines = base.SnapLines;
-
-                snapLines?.Add(new SnapLine(SnapLineType.Baseline, control.Baseline));
-
-                return snapLines;
-            }
-        }
+        return SelectionRules.AllSizeable | SelectionRules.Moveable | SelectionRules.Visible;
+      }
     }
+
+    public override IList SnapLines
+    {
+      get
+      {
+        var control = (IPAddressControl)Control;
+
+        var snapLines = base.SnapLines;
+
+        snapLines?.Add(new SnapLine(SnapLineType.Baseline, control.Baseline));
+
+        return snapLines;
+      }
+    }
+  }
 }

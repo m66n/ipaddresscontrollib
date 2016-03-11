@@ -25,9 +25,9 @@ using System;
 
 namespace IPAddressControlLib
 {
-    public class FieldChangedEventArgs : EventArgs
-    {
-        public int FieldIndex { get; set; }
-        public String Text { get; set; }
-    }
+  public class FieldChangedEventArgs : EventArgs
+  {
+    public int FieldIndex { get; set; }
+    public String Text { get; set; }
+  }
 }

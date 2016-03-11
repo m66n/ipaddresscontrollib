@@ -92,6 +92,9 @@ ipch/
 *.vsp
 *.vspx
 
+# Visual Studio 2015 Test Project
+WindowsFormsApplication*/
+
 # Guidance Automation Toolkit
 *.gpState
 
