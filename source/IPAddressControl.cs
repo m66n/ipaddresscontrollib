@@ -201,22 +201,6 @@ namespace IPAddressControlLib
       get { return CalculateMinimumSize(); }
     }
 
-    [Browsable(false)]
-    public int PreferredHeight
-    {
-      get
-      {
-        int height = FontHeight;
-
-        if (BorderStyle != BorderStyle.None)
-        {
-          height += SystemInformation.BorderSize.Height * 4 + 3;
-        }
-
-        return height;
-      }
-    }
-
     [Browsable(true)]
     public bool ReadOnly
     {
@@ -613,11 +597,11 @@ namespace IPAddressControlLib
       {
         case BorderStyle.Fixed3D:
           minimumSize.Width += 6;
-          minimumSize.Height += (PreferredHeight - minimumSize.Height);
+          minimumSize.Height += (GetSuggestedHeight() - minimumSize.Height);
           break;
         case BorderStyle.FixedSingle:
           minimumSize.Width += 4;
-          minimumSize.Height += (PreferredHeight - minimumSize.Height);
+          minimumSize.Height += (GetSuggestedHeight() - minimumSize.Height);
           break;
       }
 
@@ -640,6 +624,19 @@ namespace IPAddressControlLib
 
       _dotControls = null;
       _fieldControls = null;
+    }
+
+    private int GetSuggestedHeight()
+    {
+      int height = 0;
+      using (TextBox reference = new TextBox())
+      {
+        reference.AutoSize = true;
+        reference.BorderStyle = BorderStyle;
+        reference.Font = Font;
+        height = reference.Height;
+      }
+      return height;
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1806", Justification = "What should be done if ReleaseDC() doesn't work?")]
