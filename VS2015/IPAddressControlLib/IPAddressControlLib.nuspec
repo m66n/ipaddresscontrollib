@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/m66n/ipaddresscontrollib</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Summary of changes can be found here: https://github.com/m66n/ipaddresscontrollib/commits/master</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>IPAddressControl</tags>
+  </metadata>
+</package>
