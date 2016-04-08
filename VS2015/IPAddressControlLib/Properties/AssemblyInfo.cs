@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("IPAddressControlLib")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("C# implementation of an IP address control")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Michael Chapman")]
 [assembly: AssemblyProduct("IPAddressControlLib")]
