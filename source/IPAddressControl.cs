@@ -166,15 +166,23 @@ namespace IPAddressControlLib
     {
       get
       {
-        foreach (FieldControl fc in _fieldControls)
+        return FocusedFieldIndex != -1;
+      }
+    }
+
+    [Browsable(false)]
+    public int FocusedFieldIndex
+    {
+      get
+      {
+        for (var i = 0; i < _fieldControls.Length; i++)
         {
-          if (fc.Focused)
+          if (_fieldControls[i].Focused)
           {
-            return true;
+            return i;
           }
         }
-
-        return false;
+        return -1;
       }
     }
 
@@ -237,6 +245,37 @@ namespace IPAddressControlLib
         }
 
         Invalidate();
+      }
+    }
+
+    [Browsable(false),
+     EditorBrowsable(EditorBrowsableState.Advanced),
+     DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public int SelectionStart
+    {
+      get
+      {
+        var position = 0;
+        for (int i = 0; i < _fieldControls.Length; i++)
+        {
+          // Allow for the dots
+          if (i > 0)
+          {
+            position++;
+          }
+
+          var fieldControl = _fieldControls[i];
+          if (fieldControl.Focused)
+          {
+            return position + fieldControl.SelectionStart;
+          }
+          else
+          {
+            position += fieldControl.Text.Length;
+          }
+        }
+
+        return 0;
       }
     }
 
@@ -627,20 +666,25 @@ namespace IPAddressControlLib
 
     private void Cleanup()
     {
-      foreach (DotControl dc in _dotControls)
+      if (_dotControls != null)
       {
-        Controls.Remove(dc);
-        dc.Dispose();
+        foreach (DotControl dc in _dotControls)
+        {
+          Controls.Remove(dc);
+          dc.Dispose();
+        }
+        _dotControls = null;
       }
 
-      foreach (FieldControl fc in _fieldControls)
+      if (_fieldControls != null)
       {
-        Controls.Remove(fc);
-        fc.Dispose();
+        foreach (FieldControl fc in _fieldControls)
+        {
+          Controls.Remove(fc);
+          fc.Dispose();
+        }
+        _fieldControls = null;
       }
-
-      _dotControls = null;
-      _fieldControls = null;
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1806", Justification = "What should be done if ReleaseDC() doesn't work?")]
