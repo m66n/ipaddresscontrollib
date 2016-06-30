@@ -178,6 +178,22 @@ namespace IPAddressControlLib
       }
     }
 
+    [Browsable(false)]
+    public int FocusedFieldIndex
+    {
+      get
+      {
+        for (var i = 0; i < _fieldControls.Length; i++)
+        {
+          if (_fieldControls[i].Focused)
+          {
+            return i;
+          }
+        }
+        return -1;
+      }
+    }
+
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public IPAddress IPAddress
     {
