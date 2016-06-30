@@ -166,15 +166,7 @@ namespace IPAddressControlLib
     {
       get
       {
-        foreach (FieldControl fc in _fieldControls)
-        {
-          if (fc.Focused)
-          {
-            return true;
-          }
-        }
-
-        return false;
+        return FocusedFieldIndex != -1;
       }
     }
 
