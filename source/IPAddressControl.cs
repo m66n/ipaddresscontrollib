@@ -256,6 +256,37 @@ namespace IPAddressControlLib
       }
     }
 
+    [Browsable(false),
+     EditorBrowsable(EditorBrowsableState.Advanced),
+     DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public int SelectionStart
+    {
+      get
+      {
+        var position = 0;
+        for (int i = 0; i < _fieldControls.Length; i++)
+        {
+          // Allow for the dots
+          if (i > 0)
+          {
+            position++;
+          }
+
+          var fieldControl = _fieldControls[i];
+          if (fieldControl.Focused)
+          {
+            return position + fieldControl.SelectionStart;
+          }
+          else
+          {
+            position += fieldControl.Text.Length;
+          }
+        }
+
+        return 0;
+      }
+    }
+
     [Bindable(true)]
     [Browsable(true)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
