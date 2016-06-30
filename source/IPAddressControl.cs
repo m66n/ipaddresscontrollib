@@ -627,20 +627,25 @@ namespace IPAddressControlLib
 
     private void Cleanup()
     {
-      foreach (DotControl dc in _dotControls)
+      if (_dotControls != null)
       {
-        Controls.Remove(dc);
-        dc.Dispose();
+        foreach (DotControl dc in _dotControls)
+        {
+          Controls.Remove(dc);
+          dc.Dispose();
+        }
+        _dotControls = null;
       }
 
-      foreach (FieldControl fc in _fieldControls)
+      if (_fieldControls != null)
       {
-        Controls.Remove(fc);
-        fc.Dispose();
+        foreach (FieldControl fc in _fieldControls)
+        {
+          Controls.Remove(fc);
+          fc.Dispose();
+        }
+        _fieldControls = null;
       }
-
-      _dotControls = null;
-      _fieldControls = null;
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1806", Justification = "What should be done if ReleaseDC() doesn't work?")]
