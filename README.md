@@ -1,3 +1,5 @@
+[![NuGet](https://img.shields.io/nuget/v/IPAddressControlLib)](https://www.nuget.org/packages/IPAddressControlLib)
+
 # ipaddresscontrollib
 
 ![alt IPAddressControl in use](https://raw.githubusercontent.com/m66n/m66n.github.io/master/img/ipaddresscontrollib/TestIPAddressControl.png)
