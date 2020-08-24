@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2016  Michael Chapman
+// Copyright (c) 2007-2020  Michael Chapman
 // https://github.com/m66n/ipaddresscontrollib
 
 // The MIT License (MIT)
@@ -418,19 +418,11 @@ namespace IPAddressControlLib
         _fieldControls[index].Parent = this;
 
         _fieldControls[index].CedeFocusEvent += new EventHandler<CedeFocusEventArgs>(OnCedeFocus);
-        _fieldControls[index].Click += new EventHandler(OnSubControlClicked);
-        _fieldControls[index].DoubleClick += new EventHandler(OnSubControlDoubleClicked);
         _fieldControls[index].GotFocus += new EventHandler(OnFieldGotFocus);
         _fieldControls[index].KeyDown += new KeyEventHandler(OnFieldKeyDown);
         _fieldControls[index].KeyPress += new KeyPressEventHandler(OnFieldKeyPressed);
         _fieldControls[index].KeyUp += new KeyEventHandler(OnFieldKeyUp);
         _fieldControls[index].LostFocus += new EventHandler(OnFieldLostFocus);
-        _fieldControls[index].MouseClick += new MouseEventHandler(OnSubControlMouseClicked);
-        _fieldControls[index].MouseDoubleClick += new MouseEventHandler(OnSubControlMouseDoubleClicked);
-        _fieldControls[index].MouseEnter += new EventHandler(OnSubControlMouseEntered);
-        _fieldControls[index].MouseHover += new EventHandler(OnSubControlMouseHovered);
-        _fieldControls[index].MouseLeave += new EventHandler(OnSubControlMouseLeft);
-        _fieldControls[index].MouseMove += new MouseEventHandler(OnSubControlMouseMoved);
         _fieldControls[index].PasteEvent += new EventHandler<PasteEventArgs>(OnPaste);
         _fieldControls[index].PreviewKeyDown += new PreviewKeyDownEventHandler(OnFieldPreviewKeyDown);
         _fieldControls[index].TextChangedEvent += new EventHandler<TextChangedEventArgs>(OnFieldTextChanged);
@@ -446,14 +438,7 @@ namespace IPAddressControlLib
           _dotControls[index].Name = "DotControl" + index.ToString(CultureInfo.InvariantCulture);
           _dotControls[index].Parent = this;
 
-          _dotControls[index].Click += new EventHandler(OnSubControlClicked);
-          _dotControls[index].DoubleClick += new EventHandler(OnSubControlDoubleClicked);
-          _dotControls[index].MouseClick += new MouseEventHandler(OnSubControlMouseClicked);
-          _dotControls[index].MouseDoubleClick += new MouseEventHandler(OnSubControlMouseDoubleClicked);
-          _dotControls[index].MouseEnter += new EventHandler(OnSubControlMouseEntered);
-          _dotControls[index].MouseHover += new EventHandler(OnSubControlMouseHovered);
-          _dotControls[index].MouseLeave += new EventHandler(OnSubControlMouseLeft);
-          _dotControls[index].MouseMove += new MouseEventHandler(OnSubControlMouseMoved);
+          _dotControls[index].MouseClickEvent += new EventHandler<MouseClickEventArgs>(OnDotControlMouseClick);
 
           Controls.Add(_dotControls[index]);
         }
@@ -503,35 +488,16 @@ namespace IPAddressControlLib
     protected override void OnGotFocus(EventArgs e)
     {
       base.OnGotFocus(e);
-      _focused = true;
-      _fieldControls[0].TakeFocus(Direction.Forward, Selection.All);
-    }
-
-    protected override void OnLostFocus(EventArgs e)
-    {
       if (!Focused)
       {
-        _focused = false;
-        base.OnLostFocus(e);
+        _fieldControls[0].TakeFocus(Direction.Forward, Selection.All);
       }
     }
 
-    protected override void OnMouseEnter(EventArgs e)
+    protected override void OnMouseClick(MouseEventArgs e)
     {
-      if (!_hasMouse)
-      {
-        _hasMouse = true;
-        base.OnMouseEnter(e);
-      }
-    }
-
-    protected override void OnMouseLeave(EventArgs e)
-    {
-      if (!HasMouse)
-      {
-        base.OnMouseLeave(e);
-        _hasMouse = false;
-      }
+      base.OnMouseClick(e);
+      SetFieldFoxusByX(e.X);
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -592,18 +558,6 @@ namespace IPAddressControlLib
     }
 
     #endregion // Protected Methods
-
-    #region Private Properties
-
-    private bool HasMouse
-    {
-      get
-      {
-        return DisplayRectangle.Contains(PointToClient(MousePosition));
-      }
-    }
-
-    #endregion  // Private Properties
 
     #region Private Methods
 
@@ -834,13 +788,14 @@ namespace IPAddressControlLib
       _fieldControls[fieldIndex].TakeFocus(e.Direction, e.Selection);
     }
 
+    private void OnDotControlMouseClick(Object sender, MouseClickEventArgs e)
+    {
+      SetFieldFoxusByX(PointToClient(e.ScreenLocation).X);
+    }
+
     private void OnFieldGotFocus(Object sender, EventArgs e)
     {
-      if (!_focused)
-      {
-        _focused = true;
-        base.OnGotFocus(EventArgs.Empty);
-      }
+      base.OnGotFocus(EventArgs.Empty);
     }
 
     private void OnFieldKeyDown(Object sender, KeyEventArgs e)
@@ -867,7 +822,6 @@ namespace IPAddressControlLib
     {
       if (!Focused)
       {
-        _focused = false;
         base.OnLostFocus(EventArgs.Empty);
       }
     }
@@ -888,46 +842,6 @@ namespace IPAddressControlLib
     private void OnPaste(object sender, PasteEventArgs e)
     {
       Text = e.Text;
-    }
-
-    private void OnSubControlClicked(object sender, EventArgs e)
-    {
-      OnClick(e);
-    }
-
-    private void OnSubControlDoubleClicked(object sender, EventArgs e)
-    {
-      OnDoubleClick(e);
-    }
-
-    private void OnSubControlMouseClicked(object sender, MouseEventArgs e)
-    {
-      OnMouseClick(e);
-    }
-
-    private void OnSubControlMouseDoubleClicked(object sender, MouseEventArgs e)
-    {
-      OnMouseDoubleClick(e);
-    }
-
-    private void OnSubControlMouseEntered(object sender, EventArgs e)
-    {
-      OnMouseEnter(e);
-    }
-
-    private void OnSubControlMouseHovered(object sender, EventArgs e)
-    {
-      OnMouseHover(e);
-    }
-
-    private void OnSubControlMouseLeft(object sender, EventArgs e)
-    {
-      OnMouseLeave(e);
-    }
-
-    private void OnSubControlMouseMoved(object sender, MouseEventArgs e)
-    {
-      OnMouseMove(e);
     }
 
     private static String[] Parse(String text, String[] separators)
@@ -963,6 +877,12 @@ namespace IPAddressControlLib
       _backColorChanged = false;
     }
 
+    private void SetFieldFoxusByX(int x)
+    {
+      int index = x * _fieldControls.Length / this.Width;
+      SetFieldFocus(index);
+    }
+
     #endregion Private Methods
 
     #region Private Data
@@ -972,8 +892,6 @@ namespace IPAddressControlLib
     private BorderStyle _borderStyle = BorderStyle.Fixed3D;
     private DotControl[] _dotControls = new DotControl[FieldCount - 1];
     private FieldControl[] _fieldControls = new FieldControl[FieldCount];
-    private bool _focused;
-    private bool _hasMouse;
     private bool _readOnly;
 
     private Size Fixed3DOffset = new Size(3, 3);

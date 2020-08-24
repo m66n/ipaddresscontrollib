@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2016  Michael Chapman
+// Copyright (c) 2007-2020  Michael Chapman
 // https://github.com/m66n/ipaddresscontrollib
 
 // The MIT License (MIT)
@@ -33,6 +33,12 @@ namespace IPAddressControlLib
 {
   internal class DotControl : Control
   {
+    #region Public Events
+
+    public event EventHandler<MouseClickEventArgs> MouseClickEvent;
+
+    #endregion // Public Events
+
     #region Public Properties
 
     public override Size MinimumSize
@@ -92,12 +98,11 @@ namespace IPAddressControlLib
       TabStop = false;
 
       SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+      SetStyle(ControlStyles.FixedHeight, true);
+      SetStyle(ControlStyles.FixedWidth, true);
       SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
       SetStyle(ControlStyles.ResizeRedraw, true);
       SetStyle(ControlStyles.UserPaint, true);
-
-      SetStyle(ControlStyles.FixedHeight, true);
-      SetStyle(ControlStyles.FixedWidth, true);
     }
 
     #endregion // Constructors
@@ -108,6 +113,18 @@ namespace IPAddressControlLib
     {
       base.OnFontChanged(e);
       Size = MinimumSize;
+    }
+
+    protected override void OnMouseClick(MouseEventArgs e)
+    {
+      base.OnMouseClick(e);
+
+      if (null != MouseClickEvent)
+      {
+        MouseClickEventArgs args = new MouseClickEventArgs();
+        args.ScreenLocation = PointToScreen(e.Location);
+        MouseClickEvent(this, args);
+      }
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -172,6 +189,18 @@ namespace IPAddressControlLib
       base.Size = MinimumSize;
     }
 
+    protected override void WndProc(ref Message m)
+    {
+      switch (m.Msg)
+      {
+        case 0x0084:  // WM_NCHITTEST
+          m.Result = (IntPtr)(-1);  // HTTRANSPARENT
+          break;
+      }
+
+      base.WndProc(ref m);
+    }
+
     #endregion // Protected Methods
 
     #region Private Data
@@ -183,5 +212,16 @@ namespace IPAddressControlLib
     private SizeF _sizeText;
 
     #endregion // Private Data
+  }
+}
+
+internal class MouseClickEventArgs : EventArgs
+{
+  private Point _screenLocation;
+
+  public Point ScreenLocation
+  {
+    get { return _screenLocation; }
+    set { _screenLocation = value; }
   }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2016  Michael Chapman
+// Copyright (c) 2007-2020  Michael Chapman
 // https://github.com/m66n/ipaddresscontrollib
 
 // The MIT License (MIT)
@@ -297,8 +297,8 @@ namespace IPAddressControlLib
         HandleBackspaceKey(e);
       }
       else if (!IsNumericKey(e) &&
-                !IsEditKey(e) &&
-                !IsEnterKey(e))
+               !IsEditKey(e) &&
+               !IsEnterKey(e))
       {
         e.SuppressKeyPress = true;
       }
