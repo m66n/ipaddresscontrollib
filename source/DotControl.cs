@@ -189,18 +189,6 @@ namespace IPAddressControlLib
       base.Size = MinimumSize;
     }
 
-    protected override void WndProc(ref Message m)
-    {
-      switch (m.Msg)
-      {
-        case 0x0084:  // WM_NCHITTEST
-          m.Result = (IntPtr)(-1);  // HTTRANSPARENT
-          break;
-      }
-
-      base.WndProc(ref m);
-    }
-
     #endregion // Protected Methods
 
     #region Private Data
