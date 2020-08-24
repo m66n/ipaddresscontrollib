@@ -497,7 +497,7 @@ namespace IPAddressControlLib
     protected override void OnMouseClick(MouseEventArgs e)
     {
       base.OnMouseClick(e);
-      SetFieldFoxusByX(e.X);
+      SetFieldFocusByX(e.X);
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -790,7 +790,7 @@ namespace IPAddressControlLib
 
     private void OnDotControlMouseClick(Object sender, MouseClickEventArgs e)
     {
-      SetFieldFoxusByX(PointToClient(e.ScreenLocation).X);
+      SetFieldFocusByX(PointToClient(e.ScreenLocation).X);
     }
 
     private void OnFieldGotFocus(Object sender, EventArgs e)
@@ -877,9 +877,9 @@ namespace IPAddressControlLib
       _backColorChanged = false;
     }
 
-    private void SetFieldFoxusByX(int x)
+    private void SetFieldFocusByX(int x)
     {
-      int index = x * _fieldControls.Length / this.Width;
+      int index = x * _fieldControls.Length / Width;
       SetFieldFocus(index);
     }
 
