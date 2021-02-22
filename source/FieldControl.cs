@@ -331,7 +331,9 @@ namespace IPAddressControlLib
         int value;
         if (!Int32.TryParse(Text, out value))
         {
-          base.Text = String.Empty;
+          /*base.Text = String.Empty;*/
+          base.Text = /*String.Empty*/ "0";
+          SelectionStart = 1;
         }
         else
         {
